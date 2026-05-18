@@ -85,6 +85,130 @@ Apply changes and restart the terminal.
 
 ---
 
+# 📱 Create and install Android emulator
+
+Android emulators are managed through Android Studio using the Android Virtual Device (AVD) Manager.
+
+## ⚙️ Open Android Virtual Device Manager
+
+Open Android Studio and go to:
+
+```txt
+More Actions → Virtual Device Manager
+```
+
+Or from an opened project:
+
+```txt
+Tools → Device Manager
+```
+
+---
+
+## ➕ Create a new emulator
+
+Click:
+
+```txt
+Create Device
+```
+
+---
+
+## 📱 Select device definition
+
+Choose a device profile.
+
+Recommended examples:
+
+```txt
+Pixel 8
+Pixel 7
+Medium Phone
+```
+
+Click:
+
+```txt
+Next
+```
+
+---
+
+## 📥 Download Android system image
+
+Select an Android version image.
+
+Recommended:
+
+```txt
+Android 14 (API 34)
+```
+
+If the image is not installed yet:
+
+```txt
+Download
+```
+
+Wait until the download finishes.
+
+Click:
+
+```txt
+Next
+```
+
+---
+
+## 🛠️ Configure emulator
+
+You can customize:
+
+- Emulator name
+- RAM
+- Storage
+- Orientation
+- Graphics acceleration
+
+Recommended defaults are usually sufficient.
+
+Click:
+
+```txt
+Finish
+```
+
+---
+
+## ▶️ Start emulator
+
+Inside Device Manager click:
+
+```txt
+▶ Play
+```
+
+Wait until Android boots completely.
+
+---
+
+## 🔌 Verify emulator connection
+
+Run:
+
+```bash
+flutter devices
+```
+
+Expected result example:
+
+```txt
+emulator-5554 • Pixel_8 • android
+```
+
+---
+
 # 📜 Accept Android licenses
 
 Run:
@@ -101,24 +225,6 @@ y
 
 ---
 
-# 📱 Check available emulators
-
-```bash
-flutter emulators
-```
-
-Example:
-
-```txt
-1 available emulator:
-
-Id      • Name    • Manufacturer • Platform
-
-Pixel_8 • Pixel 8 • Google       • android
-```
-
----
-
 # ▶️ Launch Android emulator
 
 ```bash
@@ -126,20 +232,6 @@ flutter emulators --launch Pixel_8
 ```
 
 Wait until Android is fully started.
-
----
-
-# 🔌 Check connected devices
-
-```bash
-flutter devices
-```
-
-Expected result:
-
-```txt
-emulator-5554 • Pixel_8 • android
-```
 
 ---
 
@@ -265,12 +357,6 @@ flutter doctor
 flutter devices
 ```
 
-## 📱 List emulators
-
-```bash
-flutter emulators
-```
-
 ## ▶️ Run application
 
 ```bash
@@ -328,91 +414,471 @@ flutter_base_app/
 
 ---
 
-# 📦 Generate Android APK
+# 🧹 Remove unused Flutter platforms
 
-Flutter allows generating an Android `.apk` file to install the application manually on an Android device or emulator.
+Flutter is a multi-platform framework. A project can include support for several target platforms, even if the application is only going to be distributed for some of them.
 
-## 🧹 Clean project before building
+Removing platforms that are not needed helps to:
+
+- Reduce project complexity
+- Avoid unnecessary build errors
+- Simplify CI/CD pipelines
+- Reduce tooling requirements
+- Keep the repository focused on the real target platforms
+
+---
+
+# 🧩 Flutter supported platforms
+
+Flutter projects can include the following platform folders:
+
+```txt
+android/   → Android applications
+ios/       → iOS applications
+web/       → Web applications
+windows/   → Windows desktop applications
+macos/     → macOS desktop applications
+linux/     → Linux desktop applications
+```
+
+The shared Dart application code is usually located in:
+
+```txt
+lib/
+test/
+pubspec.yaml
+```
+
+These files and folders should normally be kept regardless of the target platforms.
+
+---
+
+# ✅ Check enabled platforms
+
+To see which platforms are currently enabled in your Flutter SDK, run:
+
+```bash
+flutter config
+```
+
+You can also list available devices with:
+
+```bash
+flutter devices
+```
+
+---
+
+# 📌 Remove a platform from the project
+
+To remove support for a platform, delete its folder from the root of the project.
+
+For example, to remove Web support:
+
+```txt
+web/
+```
+
+To remove Windows desktop support:
+
+```txt
+windows/
+```
+
+To remove iOS support:
+
+```txt
+ios/
+```
+
+After deleting the platform folder, run:
 
 ```bash
 flutter clean
 flutter pub get
 ```
 
-## 🔨 Generate debug APK
+---
 
-Use this option for local testing:
+# ⚙️ Disable platform support in Flutter config
+
+In addition to deleting the platform folder from the project, you can disable platform support globally in your Flutter SDK configuration.
+
+## Disable Web
+
+```bash
+flutter config --no-enable-web
+```
+
+## Disable Windows desktop
+
+```bash
+flutter config --no-enable-windows-desktop
+```
+
+## Disable Linux desktop
+
+```bash
+flutter config --no-enable-linux-desktop
+```
+
+## Disable macOS desktop
+
+```bash
+flutter config --no-enable-macos-desktop
+```
+
+## Disable iOS
+
+```bash
+flutter config --no-enable-ios
+```
+
+> Android is normally kept enabled because it is one of the most common Flutter targets.
+
+---
+
+# 🔄 Re-enable a platform later
+
+If a removed platform is needed again, enable it and regenerate the platform folder.
+
+## Re-enable Web
+
+```bash
+flutter config --enable-web
+flutter create .
+```
+
+## Re-enable Windows desktop
+
+```bash
+flutter config --enable-windows-desktop
+flutter create .
+```
+
+## Re-enable Linux desktop
+
+```bash
+flutter config --enable-linux-desktop
+flutter create .
+```
+
+## Re-enable macOS desktop
+
+```bash
+flutter config --enable-macos-desktop
+flutter create .
+```
+
+## Re-enable iOS
+
+```bash
+flutter config --enable-ios
+flutter create .
+```
+
+---
+
+# 📂 Example project structures
+
+## Project with all common platforms
+
+```txt
+flutter_base_app/
+ ├── android/
+ ├── ios/
+ ├── lib/
+ ├── linux/
+ ├── macos/
+ ├── test/
+ ├── web/
+ ├── windows/
+ ├── pubspec.yaml
+ └── README.md
+```
+
+## Project with only selected platforms
+
+Example keeping only Android and Web:
+
+```txt
+flutter_base_app/
+ ├── android/
+ ├── lib/
+ ├── test/
+ ├── web/
+ ├── pubspec.yaml
+ └── README.md
+```
+
+Example keeping only Android:
+
+```txt
+flutter_base_app/
+ ├── android/
+ ├── lib/
+ ├── test/
+ ├── pubspec.yaml
+ └── README.md
+```
+
+---
+
+# ⚠️ Tooling notes
+
+Some platforms require additional tooling:
+
+- Android requires Android Studio / Android SDK
+- iOS and macOS require XCode
+- Windows requires Visual Studio with desktop C++ tooling
+- Web requires Chrome or another supported browser
+- Linux requires Linux desktop build dependencies
+
+If a platform is removed from the project, its specific tooling is no longer needed unless another project requires it.
+
+---
+
+# 💡 Recommendation
+
+Only keep the platforms that are actually required by the product.
+
+For example:
+
+```txt
+android/
+ios/
+```
+
+or:
+
+```txt
+android/
+web/
+```
+
+or:
+
+```txt
+windows/
+```
+
+This keeps the repository easier to maintain and avoids platform-specific issues that are not relevant to the application.
+
+---
+
+# 📦 Generate application builds for all platforms
+
+Flutter can generate distributable builds for all supported target platforms.
+
+Before generating any build, it is recommended to clean the project:
+
+```bash
+flutter clean
+flutter pub get
+```
+
+---
+
+# 🤖 Android builds
+
+## Generate APK
+
+### Debug APK
 
 ```bash
 flutter build apk --debug
 ```
 
-Generated file:
-
-```txt
-build/app/outputs/flutter-apk/app-debug.apk
-```
-
-## 🚀 Generate release APK
-
-Use this option to generate a production-ready APK:
+### Release APK
 
 ```bash
 flutter build apk --release
 ```
 
-Generated file:
-
-```txt
-build/app/outputs/flutter-apk/app-release.apk
-```
-
-## 📱 Install APK on connected emulator or device
-
-Make sure the emulator or Android device is running:
-
-```bash
-flutter devices
-```
-
-Then install the APK:
-
-```bash
-adb install build/app/outputs/flutter-apk/app-release.apk
-```
-
-If the app is already installed, use:
-
-```bash
-adb install -r build/app/outputs/flutter-apk/app-release.apk
-```
-
-## 🧪 Run release mode directly
-
-You can also run the app in release mode without manually installing the APK:
-
-```bash
-flutter run --release
-```
-
-Or directly on an emulator:
-
-```bash
-flutter run --release -d emulator-5554
-```
-
-## 📂 APK output folder
-
-All generated APK files are located in:
+Generated files:
 
 ```txt
 build/app/outputs/flutter-apk/
 ```
 
-Example files:
+Example:
 
 ```txt
 app-debug.apk
 app-release.apk
-app-profile.apk
 ```
+
+---
+
+## Generate Android App Bundle (Google Play)
+
+```bash
+flutter build appbundle --release
+```
+
+Generated file:
+
+```txt
+build/app/outputs/bundle/release/app-release.aab
+```
+
+---
+
+# 🍎 iOS builds
+
+> Requires macOS and XCode installed.
+
+## Generate iOS release build
+
+```bash
+flutter build ipa
+```
+
+Generated files are located under:
+
+```txt
+build/ios/
+```
+
+---
+
+# 🌐 Web builds
+
+## Generate production web build
+
+```bash
+flutter build web
+```
+
+Generated files:
+
+```txt
+build/web/
+```
+
+These files can be deployed to:
+
+- Nginx
+- Apache
+- Firebase Hosting
+- GitHub Pages
+- Azure
+- AWS S3
+- Any static hosting provider
+
+---
+
+# 🪟 Windows desktop builds
+
+> Requires Visual Studio with Desktop Development tools installed.
+
+## Generate Windows executable
+
+```bash
+flutter build windows
+```
+
+Generated files:
+
+```txt
+build/windows/
+```
+
+---
+
+# 🍎 macOS desktop builds
+
+> Requires macOS and XCode installed.
+
+## Generate macOS desktop application
+
+```bash
+flutter build macos
+```
+
+Generated files:
+
+```txt
+build/macos/
+```
+
+---
+
+# 🐧 Linux desktop builds
+
+> Requires Linux desktop build dependencies installed.
+
+## Generate Linux desktop application
+
+```bash
+flutter build linux
+```
+
+Generated files:
+
+```txt
+build/linux/
+```
+
+---
+
+# 🧪 Run application in release mode
+
+Flutter can run applications directly in release mode without manually installing the generated build.
+
+## Android
+
+```bash
+flutter run --release
+```
+
+## Web
+
+```bash
+flutter run -d chrome --release
+```
+
+## Windows
+
+```bash
+flutter run -d windows --release
+```
+
+## macOS
+
+```bash
+flutter run -d macos --release
+```
+
+## Linux
+
+```bash
+flutter run -d linux --release
+```
+
+---
+
+# ⚠️ Platform requirements
+
+Each platform requires its own tooling and SDKs.
+
+| Platform | Required tooling                  |
+| -------- | --------------------------------- |
+| Android  | Android Studio + Android SDK      |
+| iOS      | macOS + XCode                     |
+| macOS    | XCode                             |
+| Windows  | Visual Studio Desktop Development |
+| Linux    | Linux build dependencies          |
+| Web      | Supported browser                 |
+
+---
+
+# 🩺 Verify platform setup
+
+Use:
+
+```bash
+flutter doctor -v
+```
+
+Flutter will show missing SDKs, licenses, or build tools for each enabled platform.
