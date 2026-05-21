@@ -1,0 +1,23 @@
+{
+  "cities": "Cities",
+  "cities_module_description": "Manage city catalogs and city-related workflows.",
+  "close": "Close",
+  "home": "Home",
+  "home_module_description": "Select a module from the drawer to start working with the available sections.",
+  "login": "Login",
+  "logout": "Logout",
+  "logout_module_description": "Close the current session.",
+  "max_length": "Maximum length is {maxLength} characters",
+  "meteo_stations": "Meteo Stations",
+  "meteo_stations_module_description": "Manage weather stations and related operational data.",
+  "modules": "Modules",
+  "operation_completed_successfully": "Operation completed successfully.",
+  "password": "Password",
+  "request_failed": "Request failed",
+  "required_field": "Required field",
+  "sign_in": "Sign in",
+  "sign_in_description": "Use your username and password to continue.",
+  "username": "Username",
+  "users": "Users",
+  "users_module_description": "Manage platform users and their account access."
+}

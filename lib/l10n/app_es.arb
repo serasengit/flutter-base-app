@@ -1,0 +1,23 @@
+{
+  "cities": "Ciudades",
+  "cities_module_description": "Gestiona catálogos de ciudades y flujos relacionados con ciudades.",
+  "close": "Cerrar",
+  "home": "Inicio",
+  "home_module_description": "Selecciona un módulo del menú para empezar a trabajar con las secciones disponibles.",
+  "login": "Iniciar sesión",
+  "logout": "Cerrar sesión",
+  "logout_module_description": "Cierra la sesión actual.",
+  "max_length": "La longitud máxima es de {maxLength} caracteres",
+  "meteo_stations": "Estaciones meteorológicas",
+  "meteo_stations_module_description": "Gestiona estaciones meteorológicas y sus datos operativos relacionados.",
+  "modules": "Módulos",
+  "operation_completed_successfully": "La operación se ha completado correctamente.",
+  "password": "Contraseña",
+  "request_failed": "La solicitud ha fallado",
+  "required_field": "Campo obligatorio",
+  "sign_in": "Acceder",
+  "sign_in_description": "Usa tu nombre de usuario y contraseña para continuar.",
+  "username": "Nombre de usuario",
+  "users": "Usuarios",
+  "users_module_description": "Gestiona los usuarios de la plataforma y su acceso."
+}
