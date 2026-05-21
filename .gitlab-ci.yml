@@ -1,0 +1,130 @@
+stages:
+  - dependencies
+  - analyze
+  - test
+  - build
+  - sonar
+
+default:
+  image: ghcr.io/cirruslabs/flutter:stable
+  before_script:
+    - flutter --version
+    - dart --version
+
+variables:
+  PUB_CACHE: "$CI_PROJECT_DIR/.pub-cache"
+  GIT_DEPTH: "0"
+
+cache:
+  key:
+    files:
+      - pubspec.lock
+  paths:
+    - .pub-cache/
+    - .dart_tool/
+  policy: pull-push
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_COMMIT_BRANCH == "main"
+
+dependencies:
+  stage: dependencies
+  script:
+    - flutter pub get
+  artifacts:
+    paths:
+      - .dart_tool/
+      - pubspec.lock
+    expire_in: 1 hour
+
+analyze:
+  stage: analyze
+  needs:
+    - job: dependencies
+      artifacts: true
+  script:
+    - flutter analyze
+
+test:
+  stage: test
+  needs:
+    - job: dependencies
+      artifacts: true
+  script:
+    - flutter test --coverage
+    - |
+      if [ -z "$MIN_COVERAGE_PERCENTAGE" ]; then
+        echo "MIN_COVERAGE_PERCENTAGE GitLab CI/CD variable is required."
+        exit 1
+      fi
+    - |
+      TOTAL_COVERAGE=$(awk -F: '
+        /^LF:/ { total += $2 }
+        /^LH:/ { covered += $2 }
+        END {
+          if (total == 0) {
+            printf "0.00"
+          } else {
+            printf "%.2f", (covered / total) * 100
+          }
+        }
+      ' coverage/lcov.info)
+      echo "TOTAL_COVERAGE=${TOTAL_COVERAGE}"
+      awk -v actual="$TOTAL_COVERAGE" -v minimum="$MIN_COVERAGE_PERCENTAGE" '
+        BEGIN {
+          if ((actual + 0) < (minimum + 0)) {
+            printf "Coverage %.2f%% is below required %.2f%%\n", actual, minimum
+            exit 1
+          }
+          printf "Coverage %.2f%% meets required %.2f%%\n", actual, minimum
+        }
+      '
+  coverage: '/TOTAL_COVERAGE=([0-9]+\.[0-9]+)/'
+  artifacts:
+    when: always
+    paths:
+      - coverage/
+    expire_in: 1 week
+
+build:
+  stage: build
+  needs:
+    - job: dependencies
+      artifacts: true
+  script:
+    - flutter build apk --debug
+  artifacts:
+    paths:
+      - build/app/outputs/flutter-apk/
+    expire_in: 1 week
+
+sonar:
+  stage: sonar
+  image:
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  needs:
+    - job: test
+      artifacts: true
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+  cache:
+    key: sonar-cache
+    paths:
+      - .sonar/cache/
+  before_script: []
+  script:
+    - |
+      if [ -z "$SONAR_HOST_URL" ]; then
+        echo "SONAR_HOST_URL GitLab CI/CD variable is required."
+        exit 1
+      fi
+      if [ -z "$SONAR_TOKEN" ]; then
+        echo "SONAR_TOKEN GitLab CI/CD variable is required."
+        exit 1
+      fi
+    - sonar-scanner -Dsonar.host.url="${SONAR_HOST_URL}" -Dsonar.token="${SONAR_TOKEN}"
+  allow_failure: true
