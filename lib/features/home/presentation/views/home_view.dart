@@ -24,7 +24,19 @@ class HomeView extends StatelessWidget {
       builder: (context, state) {
         final currentModule = state.module;
 
-        return Scaffold(
+        return PopScope<Object?>(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) {
+            if (!didPop) {
+              if (state.canGoBackModule) {
+                context.read<AppBloc>().add(const PopModule());
+                return;
+              }
+
+              context.read<AuthBloc>().add(const LogOut());
+            }
+          },
+          child: Scaffold(
           appBar: AppBar(title: Text(_getModuleTitle(l10n, currentModule))),
           drawer: _HomeDrawer(
             title: l10n.modules,
@@ -32,6 +44,7 @@ class HomeView extends StatelessWidget {
             currentModule: currentModule,
           ),
           body: _buildModuleView(currentModule),
+          ),
         );
       },
     );
