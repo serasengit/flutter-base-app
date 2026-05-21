@@ -1,3 +1,4 @@
+import 'package:flutter_base_app/app/routes/app_routes.dart';
 import 'package:flutter_base_app/core/network/api_error.dart';
 import 'package:flutter_base_app/core/network/request_tracker.dart';
 import 'package:http/http.dart' as http;
@@ -73,7 +74,7 @@ class TrackingHttpClient extends http.BaseClient {
     http.StreamedResponse response,
   ) {
     final isSuccess = response.statusCode >= 200 && response.statusCode < 300;
-    final isAuthRequest = request.url.path.contains('/auth');
+    final isAuthRequest = request.url.path.contains(AppRoutes.auth);
     final isGetRequest = request.method.toUpperCase() == 'GET';
 
     return isSuccess && !isAuthRequest && !isGetRequest;

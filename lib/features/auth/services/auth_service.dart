@@ -4,6 +4,7 @@ import 'package:flutter_base_app/app/config/app_config.dart';
 import 'package:flutter_base_app/core/network/http_client_factory.dart';
 import 'package:flutter_base_app/features/auth/models/auth.dart';
 import 'package:flutter_base_app/features/auth/models/login.dart';
+import 'package:http/http.dart' as http;
 
 ///
 /// Authentication service
@@ -11,7 +12,10 @@ import 'package:flutter_base_app/features/auth/models/login.dart';
 /// Responsible for direct HTTP communication with the authentication API.
 ///
 class AuthService {
-  final _client = HttpClientFactory.create();
+  final http.Client _client;
+
+  AuthService({http.Client? client})
+    : _client = client ?? HttpClientFactory.create();
 
   ///
   /// Sends login credentials to the backend.

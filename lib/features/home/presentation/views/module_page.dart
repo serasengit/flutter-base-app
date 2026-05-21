@@ -19,28 +19,32 @@ class ModulePage extends StatelessWidget {
       appBar: AppBar(title: Text(title)),
       body: Center(
         child: Padding(
-          padding: ViewLayout.pagePadding,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: 56,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              GapLayout.vSm,
-              Text(
-                title,
-                style: Theme.of(context).textTheme.headlineMedium,
-                textAlign: TextAlign.center,
-              ),
-              GapLayout.vXs,
-              Text(
-                description,
-                style: Theme.of(context).textTheme.bodyLarge,
-                textAlign: TextAlign.center,
-              ),
-            ],
+          padding: ViewLayout.pagePadding(context),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: ModuleLayout.contentMaxWidth(context),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: ModuleLayout.contentSpacing(context),
+              children: [
+                Icon(
+                  icon,
+                  size: ModuleLayout.iconSize(context),
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.headlineMedium,
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  description,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
         ),
       ),

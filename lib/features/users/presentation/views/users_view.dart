@@ -12,24 +12,25 @@ class UsersView extends StatelessWidget {
 
     return Center(
       child: Padding(
-        padding: ViewLayout.pagePadding,
+        padding: ViewLayout.pagePadding(context),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 520),
+          constraints: BoxConstraints(
+            maxWidth: ModuleLayout.contentMaxWidth(context),
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            spacing: ModuleLayout.contentSpacing(context),
             children: [
               Icon(
-                Icons.people_outline,
-                size: ModuleLayout.iconSize,
+                Icons.people_outlined,
+                size: ModuleLayout.iconSize(context),
                 color: Theme.of(context).colorScheme.primary,
               ),
-              GapLayout.vSm,
               Text(
                 l10n.users,
                 style: textTheme.headlineMedium,
                 textAlign: TextAlign.center,
               ),
-              GapLayout.vXs,
               Text(
                 l10n.users_module_description,
                 style: textTheme.bodyLarge,

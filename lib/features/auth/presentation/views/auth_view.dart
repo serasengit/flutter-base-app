@@ -48,10 +48,10 @@ class _AuthContentState extends State<_AuthContent> {
     return SafeArea(
       child: Center(
         child: SingleChildScrollView(
-          padding: ViewLayout.pagePadding,
+          padding: ViewLayout.pagePadding(context),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: FormLayout.authFormMaxWidth,
+            constraints: BoxConstraints(
+              maxWidth: FormLayout.formMaxWidth(context),
             ),
             child: _form(context, l10n),
           ),
@@ -65,15 +65,12 @@ class _AuthContentState extends State<_AuthContent> {
       key: controller.formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: FormLayout.fieldSpacing(context),
         children: [
           _title(context, l10n),
-          GapLayout.vXs,
           _subtitle(context, l10n),
-          GapLayout.vLg,
           _usernameField(l10n),
-          GapLayout.vSm,
           _passwordField(context, l10n),
-          GapLayout.vMd,
           _submitButton(context, l10n),
         ],
       ),

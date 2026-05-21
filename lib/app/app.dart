@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_base_app/app/bloc/app_bloc.dart';
 import 'package:flutter_base_app/app/bloc/app_event.dart';
@@ -44,9 +46,8 @@ class _AppState extends State<App> {
   }
 
   @override
-  Future<void> dispose() async {
-    // Dispose request feedback resources before removing the widget.
-    await _requestFeedbackController.dispose();
+  void dispose() {
+    unawaited(_requestFeedbackController.dispose());
     super.dispose();
   }
 

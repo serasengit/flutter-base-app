@@ -105,6 +105,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  # Flutter integration testing support
+  integration_test:
+    sdk: flutter
+
   # Recommended Flutter lint rules
   # Helps maintain code quality and consistency
   flutter_lints: ^6.0.0

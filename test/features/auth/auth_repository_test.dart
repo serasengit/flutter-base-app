@@ -1,7 +1,98 @@
+import 'package:flutter_base_app/core/di/injectable.dart';
+import 'package:flutter_base_app/core/storage/storage_service.dart';
+import 'package:flutter_base_app/features/auth/models/auth.dart';
+import 'package:flutter_base_app/features/auth/models/login.dart';
+import 'package:flutter_base_app/features/auth/models/user.dart';
+import 'package:flutter_base_app/features/auth/repositories/auth_repository.dart';
+import 'package:flutter_base_app/features/auth/services/auth_service.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class _FakeAuthService extends AuthService {
+  _FakeAuthService({
+    required this.authToReturn,
+    this.onLogout,
+  });
+
+  final Auth authToReturn;
+  final void Function()? onLogout;
+
+  @override
+  Future<Auth> login(Login login) async => authToReturn;
+
+  @override
+  Future<void> logout() async {
+    onLogout?.call();
+  }
+}
 
 void main() {
-  test('auth repository test placeholder', () {
-    expect(true, isTrue);
-  }, skip: 'Pending auth repository unit tests');
+  setUp(() {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    configureDependencies();
+  });
+
+  test('stores auth token on successful login', () async {
+    const auth = Auth(
+      accessToken: 'token',
+      isAuthenticated: true,
+      user: User(id: '1', username: 'tester'),
+      permissions: <String>['users:read'],
+    );
+    final storageService = StorageService();
+    final repository = AuthRepository(
+      authService: _FakeAuthService(authToReturn: auth),
+      storageService: storageService,
+    );
+
+    final result = await repository.login(
+      const Login(username: 'tester', password: 'secret'),
+    );
+
+    expect(result, same(auth));
+    expect(await storageService.getAuthToken(), 'token');
+  });
+
+  test('does not store auth token when login is not authenticated', () async {
+    const auth = Auth(
+      accessToken: '',
+      isAuthenticated: false,
+      user: User(id: '1', username: 'tester'),
+      permissions: <String>[],
+    );
+    final storageService = StorageService();
+    final repository = AuthRepository(
+      authService: _FakeAuthService(authToReturn: auth),
+      storageService: storageService,
+    );
+
+    await repository.login(const Login(username: 'tester', password: 'secret'));
+
+    expect(await storageService.getAuthToken(), isNull);
+  });
+
+  test('logout clears persisted auth token', () async {
+    var didLogout = false;
+    const auth = Auth(
+      accessToken: 'token',
+      isAuthenticated: true,
+      user: User(id: '1', username: 'tester'),
+      permissions: <String>[],
+    );
+    final storageService = StorageService();
+    await storageService.saveAuthToken('token');
+
+    final repository = AuthRepository(
+      authService: _FakeAuthService(
+        authToReturn: auth,
+        onLogout: () => didLogout = true,
+      ),
+      storageService: storageService,
+    );
+
+    await repository.logout();
+
+    expect(didLogout, isTrue);
+    expect(await storageService.getAuthToken(), isNull);
+  });
 }

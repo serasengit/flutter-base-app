@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_base_app/core/network/request_tracker.dart';
 import 'package:flutter_base_app/core/dialogs/dialog_service.dart';
+import 'package:flutter_base_app/core/network/request_tracker.dart';
+import 'package:flutter_base_app/core/utils/functions.dart';
 import 'package:flutter_base_app/l10n/app_localizations.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
@@ -36,24 +37,24 @@ class RequestFeedbackCoordinator {
 
   void _handleTrackerEvent(RequestTrackerEvent event) {
     final context = _dialogService.navigatorKey.currentContext;
-    if (context == null) {
+    if (!isSet(context)) {
       return;
     }
 
     switch (event) {
       case ShowLoaderEvent():
-        context.loaderOverlay.show();
+        context!.loaderOverlay.show();
       case HideLoaderEvent():
-        context.loaderOverlay.hide();
+        context!.loaderOverlay.hide();
       case ShowRequestErrorsEvent(messages: final messages):
         _dialogService.showMessagesDialog(
           type: DialogType.error,
-          title: AppLocalizations.of(context)!.request_failed,
+          title: AppLocalizations.of(context!)!.request_failed,
           messages: messages,
         );
       case ShowRequestSuccessEvent():
         _dialogService.openDialog(
-          context,
+          context!,
           key: 'requestSuccessDialog',
           title: AppLocalizations.of(context)!.operation_completed_successfully,
           type: DialogType.success,

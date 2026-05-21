@@ -46,3 +46,7 @@ app.*.map.json
 
 # Environment files
 .env
+
+# Scripts
+/scripts/
+

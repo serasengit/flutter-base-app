@@ -78,7 +78,7 @@ class DialogService {
     bool barrierDismissible = true,
   }) async {
     final context = _navigatorKey?.currentContext;
-    if (context == null || _isShowingDialog) {
+    if (!isSet(context) || _isShowingDialog) {
       return;
     }
 
@@ -91,7 +91,7 @@ class DialogService {
     _isShowingDialog = true;
 
     await showDialog<void>(
-      context: context,
+      context: context!,
       barrierDismissible: barrierDismissible,
       builder: (dialogContext) {
         final color = _getColor(type);

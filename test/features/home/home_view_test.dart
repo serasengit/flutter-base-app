@@ -1,0 +1,70 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_base_app/app/bloc/app_bloc.dart';
+import 'package:flutter_base_app/core/di/injectable.dart';
+import 'package:flutter_base_app/core/storage/storage_service.dart';
+import 'package:flutter_base_app/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:flutter_base_app/features/auth/repositories/auth_repository.dart';
+import 'package:flutter_base_app/features/auth/services/auth_service.dart';
+import 'package:flutter_base_app/features/home/presentation/views/home_view.dart';
+import 'package:flutter_base_app/l10n/app_localizations.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:logger/logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class _FakeAuthService extends AuthService {
+  @override
+  Future<void> logout() async {}
+}
+
+Widget _buildHome(AppBloc appBloc, AuthBloc authBloc) {
+  return MultiBlocProvider(
+    providers: <BlocProvider<dynamic>>[
+      BlocProvider<AppBloc>.value(value: appBloc),
+      BlocProvider<AuthBloc>.value(value: authBloc),
+    ],
+    child: MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: const HomeView(),
+    ),
+  );
+}
+
+void main() {
+  late AppBloc appBloc;
+  late AuthBloc authBloc;
+
+  setUp(() {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    configureDependencies();
+    appBloc = AppBloc();
+    authBloc = AuthBloc(
+      repository: AuthRepository(
+        authService: _FakeAuthService(),
+        storageService: StorageService(),
+      ),
+      logger: Logger(),
+    );
+  });
+
+  tearDown(() async {
+    await appBloc.close();
+    await authBloc.close();
+  });
+
+  testWidgets('drawer shows available modules', (tester) async {
+    await tester.pumpWidget(_buildHome(appBloc, authBloc));
+    await tester.pumpAndSettle();
+
+    final l10n = AppLocalizations.of(tester.element(find.byType(HomeView)))!;
+
+    await tester.tap(find.byIcon(Icons.menu));
+    await tester.pumpAndSettle();
+
+    expect(find.text(l10n.users), findsOneWidget);
+    expect(find.text(l10n.cities), findsOneWidget);
+    expect(find.text(l10n.meteo_stations), findsOneWidget);
+    expect(find.text(l10n.logout), findsOneWidget);
+  });
+}

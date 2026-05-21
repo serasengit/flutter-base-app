@@ -882,3 +882,62 @@ flutter doctor -v
 ```
 
 Flutter will show missing SDKs, licenses, or build tools for each enabled platform.
+
+---
+
+# Testing
+
+This project separates fast `flutter test` suites from heavier app flow tests.
+
+## Test structure
+
+```txt
+test/
+ ├── app/
+ ├── core/
+ ├── features/
+ └── widget_test.dart
+
+integration_test/
+ └── features/
+     └── auth/
+```
+
+## Unit and widget tests
+
+These are the tests executed by the default Flutter runner:
+
+```bash
+flutter test
+```
+
+To generate coverage for this suite:
+
+```bash
+flutter test --coverage
+```
+
+PowerShell helper:
+
+```powershell
+.\scripts\run_coverage.ps1
+```
+
+## Integration tests
+
+Authentication flow tests live under `integration_test/` and are executed separately:
+
+```bash
+flutter test integration_test
+```
+
+PowerShell helper:
+
+```powershell
+.\scripts\run_integration_tests.ps1
+```
+
+## Why they are separate
+
+`flutter test --coverage` is intended for the regular `test/` suite.
+Keeping heavier app-flow tests in `integration_test/` avoids hangs and makes coverage runs more stable.

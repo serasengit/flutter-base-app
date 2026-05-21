@@ -3,7 +3,6 @@
 ///
 bool isSet(dynamic value) =>
     value != null &&
-    value != "null" &&
     value != "" &&
     value.toString() != '{}' &&
     value.toString() != '[]' &&
