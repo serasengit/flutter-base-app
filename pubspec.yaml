@@ -80,6 +80,9 @@ dependencies:
   # such as repositories, services and blocs
   get_it: ^9.2.1
 
+  # Reads application version and build metadata from the platform package
+  package_info_plus: ^8.3.1
+
   # Flutter integration for Bloc state management
   # Provides:
   # - BlocProvider

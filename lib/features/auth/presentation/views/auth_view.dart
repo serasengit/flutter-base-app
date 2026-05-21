@@ -24,6 +24,12 @@ class _AuthContentState extends State<_AuthContent> {
   final controller = AuthController();
 
   @override
+  void initState() {
+    super.initState();
+    controller.initPackageInfo();
+  }
+
+  @override
   void dispose() {
     controller.dispose();
     super.dispose();
@@ -37,7 +43,11 @@ class _AuthContentState extends State<_AuthContent> {
   }
 
   Widget _scaffold(BuildContext context, AppLocalizations l10n) {
-    return Scaffold(appBar: _appBar(l10n), body: _body(context, l10n));
+    return Scaffold(
+      appBar: _appBar(l10n),
+      body: _body(context, l10n),
+      bottomNavigationBar: _bottomAppBar(context),
+    );
   }
 
   PreferredSizeWidget _appBar(AppLocalizations l10n) {
@@ -129,6 +139,28 @@ class _AuthContentState extends State<_AuthContent> {
     return ElevatedButton(
       onPressed: () => controller.submit(context),
       child: Text(l10n.login),
+    );
+  }
+
+  Widget _bottomAppBar(BuildContext context) {
+    return BottomAppBar(
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: FormLayout.fieldSpacing(context) / 2,
+        ),
+        child: ValueListenableBuilder<String?>(
+          valueListenable: controller.appVersion,
+          builder: (context, version, child) {
+            return Text(
+              'v$version',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 }

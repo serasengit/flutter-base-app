@@ -1,68 +1,91 @@
+# Define the pipeline execution order.
 stages:
-  - dependencies
-  - analyze
-  - test
-  - build
-  - sonar
+  - dependencies # First stage: install Flutter and Dart dependencies.
+  - analyze # Second stage: run static analysis.
+  - test # Third stage: run tests and validate coverage.
+  - build # Fourth stage: build the Android APK.
+  - sonar # Fifth stage: run SonarQube static analysis.
 
+# Shared configuration used by most jobs.
 default:
-  image: ghcr.io/cirruslabs/flutter:stable
+  image: ghcr.io/cirruslabs/flutter:stable # Official Flutter Docker image.
+
   before_script:
-    - flutter --version
-    - dart --version
-    - cp .env.test .env
-    - flutter pub get
+    - flutter --version # Print Flutter version for troubleshooting.
+    - dart --version # Print Dart version for troubleshooting.
+    - cp .env.test .env # Copy the test environment file used by the application.
+    - flutter pub get # Install project dependencies.
 
+# Shared pipeline variables.
 variables:
-  PUB_CACHE: "$CI_PROJECT_DIR/.pub-cache"
-  GIT_DEPTH: "0"
+  PUB_CACHE: "$CI_PROJECT_DIR/.pub-cache" # Store the Dart package cache inside the project workspace.
+  GIT_DEPTH: "0" # Fetch the full Git history for SonarQube blame information.
 
+# Cache Flutter and Dart dependencies between pipeline executions.
 cache:
   key:
     files:
-      - pubspec.lock
-  paths:
-    - .pub-cache/
-    - .dart_tool/
-  policy: pull-push
+      - pubspec.lock # Rebuild the cache when dependencies change.
 
+  paths:
+    - .pub-cache/ # Cache downloaded Dart packages.
+    - .dart_tool/ # Cache Dart build and analysis metadata.
+
+  policy: pull-push # Restore the cache before the job and update it afterwards.
+
+# Run pipelines only for merge requests and main development branches.
 workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_COMMIT_BRANCH == "main"
 
+# Install project dependencies once and reuse them in downstream jobs.
 dependencies:
   stage: dependencies
+
   script:
-    - flutter pub get
+    - flutter pub get # Install Flutter and Dart dependencies.
+
   artifacts:
     paths:
-      - .pub-cache/
-      - .dart_tool/
-      - pubspec.lock
-    expire_in: 1 hour
+      - .pub-cache/ # Share cached packages with downstream jobs.
+      - .dart_tool/ # Share Dart metadata with downstream jobs.
+      - pubspec.lock # Share the dependency lock file.
 
+    expire_in: 1 hour # Keep dependency artifacts only for downstream jobs.
+
+# Run static analysis to detect lint and compile-time issues.
 analyze:
   stage: analyze
-  needs:
-    - job: dependencies
-      artifacts: true
-  script:
-    - flutter analyze
 
+  needs:
+    - job: dependencies # Reuse dependencies installed in the dependencies job.
+      artifacts: true # Download dependency artifacts.
+
+  script:
+    - flutter analyze # Run Flutter static analysis.
+
+# Run tests, generate coverage, and validate the minimum coverage threshold.
 test:
   stage: test
+
   needs:
-    - job: dependencies
-      artifacts: true
+    - job: dependencies # Reuse dependencies installed in the dependencies job.
+      artifacts: true # Download dependency artifacts.
+
   script:
+    # Run all Flutter tests and generate the LCOV coverage report.
     - flutter test --coverage
+
+    # Ensure the minimum coverage variable exists.
     - |
       if [ -z "$MIN_COVERAGE_PERCENTAGE" ]; then
         echo "MIN_COVERAGE_PERCENTAGE GitLab CI/CD variable is required."
         exit 1
       fi
+
+    # Calculate total project coverage from the LCOV report.
     - |
       TOTAL_COVERAGE=$(awk -F: '
         /^LF:/ { total += $2 }
@@ -75,59 +98,91 @@ test:
           }
         }
       ' coverage/lcov.info)
+
       echo "TOTAL_COVERAGE=${TOTAL_COVERAGE}"
+
+      # Fail the pipeline if coverage is below the configured threshold.
       awk -v actual="$TOTAL_COVERAGE" -v minimum="$MIN_COVERAGE_PERCENTAGE" '
         BEGIN {
           if ((actual + 0) < (minimum + 0)) {
             printf "Coverage %.2f%% is below required %.2f%%\n", actual, minimum
             exit 1
           }
+
           printf "Coverage %.2f%% meets required %.2f%%\n", actual, minimum
         }
       '
-  coverage: '/TOTAL_COVERAGE=([0-9]+\.[0-9]+)/'
-  artifacts:
-    when: always
-    paths:
-      - coverage/
-    expire_in: 1 week
 
+  # Extract the coverage percentage from the job logs.
+  coverage: '/TOTAL_COVERAGE=([0-9]+\.[0-9]+)/'
+
+  artifacts:
+    when: always # Upload coverage artifacts even if tests fail.
+
+    paths:
+      - coverage/ # Store generated coverage reports.
+
+    expire_in: 1 week # Keep coverage artifacts available for SonarQube analysis.
+
+# Build the Android APK to validate the Android build pipeline.
 build:
   stage: build
+
   needs:
-    - job: dependencies
-      artifacts: true
+    - job: dependencies # Reuse dependencies installed in the dependencies job.
+      artifacts: true # Download dependency artifacts.
+
   script:
-    - flutter build apk --debug
+    - flutter build apk --debug # Build the Android debug APK.
+
   artifacts:
     paths:
-      - build/app/outputs/flutter-apk/
-    expire_in: 1 week
+      - build/app/outputs/flutter-apk/ # Store generated APK artifacts.
 
+    expire_in: 1 week # Keep build artifacts available for download.
+
+# Run SonarQube static analysis.
 sonar:
   stage: sonar
+
+  # Use the official SonarScanner CLI image.
   image:
     name: sonarsource/sonar-scanner-cli:latest
-    entrypoint: [""]
+    entrypoint: [""] # Override the default entrypoint so GitLab can execute script commands.
+
   needs:
-    - job: test
-      artifacts: true
+    - job: test # Download coverage artifacts from the test job.
+      artifacts: true # Make coverage reports available to SonarScanner.
+
   variables:
-    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar" # Store SonarScanner cache inside the project workspace.
+
   cache:
-    key: sonar-cache
+    key: sonar-cache # Reuse SonarScanner cache between pipeline executions.
+
     paths:
-      - .sonar/cache/
+      - .sonar/cache/ # Cache downloaded SonarScanner analyzers and dependencies.
+
+  # Skip the default Flutter setup because this job uses the SonarScanner image.
   before_script: []
+
   script:
+    # Ensure the SonarQube server URL variable exists.
     - |
       if [ -z "$SONAR_HOST_URL" ]; then
         echo "SONAR_HOST_URL GitLab CI/CD variable is required."
         exit 1
       fi
+
+      # Ensure the SonarQube authentication token exists.
       if [ -z "$SONAR_TOKEN" ]; then
         echo "SONAR_TOKEN GitLab CI/CD variable is required."
         exit 1
       fi
+
+    # Run SonarScanner using sonar-project.properties.
     - sonar-scanner -Dsonar.host.url="${SONAR_HOST_URL}" -Dsonar.token="${SONAR_TOKEN}"
+
+  # Do not fail the full pipeline if SonarQube analysis fails.
+  # SonarQube Community Build does not officially support Dart analysis.
   allow_failure: true
