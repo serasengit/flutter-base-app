@@ -1,943 +1,538 @@
-# 🚀 flutter_base_app
-
-Base Flutter application used as a starter project.
-
----
-
-# 📋 Requirements
-
-Before starting, make sure you have installed:
-
-- ✅ Git
-- ✅ Visual Studio Code
-- ✅ Flutter SDK
-- ✅ Android Studio
-- ✅ Android SDK Command-line Tools
-- ✅ Android Emulator
-- ✅ VS Code Flutter extension
-- ✅ VS Code Dart extension
-
-Official Flutter setup guide:
-
-🔗 https://docs.flutter.dev/install/with-vs-code
-
----
-
-# 📥 Clone the repository
-
-```bash
-git clone <REPOSITORY_URL>
-cd flutter_base_app
-```
-
----
-
-# 📦 Install dependencies
-
-```bash
-flutter pub get
-```
-
----
-
-# 🩺 Verify Flutter setup
-
-Run:
-
-```bash
-flutter doctor -v
-```
-
-Expected result:
-
-```txt
-[√] Flutter
-[√] Android toolchain
-[√] Connected device
-```
-
----
-
-# ⚙️ Android SDK setup
-
-Open Android Studio:
-
-```txt
-More Actions → SDK Manager
-```
-
-Go to:
-
-```txt
-SDK Tools
-```
-
-Install or enable:
-
-```txt
-Android SDK Command-line Tools (latest)
-Android SDK Platform-Tools
-Android SDK Build-Tools
-Android Emulator
-```
-
-Apply changes and restart the terminal.
-
----
-
-# 📱 Create and install Android emulator
-
-Android emulators are managed through Android Studio using the Android Virtual Device (AVD) Manager.
-
-## ⚙️ Open Android Virtual Device Manager
-
-Open Android Studio and go to:
-
-```txt
-More Actions → Virtual Device Manager
-```
-
-Or from an opened project:
-
-```txt
-Tools → Device Manager
-```
-
----
-
-## ➕ Create a new emulator
-
-Click:
-
-```txt
-Create Device
-```
-
----
-
-## 📱 Select device definition
-
-Choose a device profile.
-
-Recommended examples:
-
-```txt
-Pixel 8
-Pixel 7
-Medium Phone
-```
-
-Click:
-
-```txt
-Next
-```
-
----
-
-## 📥 Download Android system image
-
-Select an Android version image.
-
-Recommended:
-
-```txt
-Android 14 (API 34)
-```
-
-If the image is not installed yet:
-
-```txt
-Download
-```
-
-Wait until the download finishes.
-
-Click:
-
-```txt
-Next
-```
-
----
-
-## 🛠️ Configure emulator
-
-You can customize:
-
-- Emulator name
-- RAM
-- Storage
-- Orientation
-- Graphics acceleration
-
-Recommended defaults are usually sufficient.
-
-Click:
-
-```txt
-Finish
-```
-
----
-
-## ▶️ Start emulator
-
-Inside Device Manager click:
-
-```txt
-▶ Play
-```
-
-Wait until Android boots completely.
-
----
-
-## 🔌 Verify emulator connection
-
-Run:
-
-```bash
-flutter devices
-```
-
-Expected result example:
-
-```txt
-emulator-5554 • Pixel_8 • android
-```
-
----
-
-# 📜 Accept Android licenses
-
-Run:
-
-```bash
-flutter doctor --android-licenses
-```
-
-Accept all licenses:
-
-```txt
-y
-```
-
----
-
-# ▶️ Launch Android emulator
-
-```bash
-flutter emulators --launch Pixel_8
-```
-
-Wait until Android is fully started.
-
----
-
-# ▶️ Run the application
-
-```bash
-flutter run
-```
-
-Or directly on the emulator:
-
-```bash
-flutter run -d emulator-5554
-```
-
----
-
-# 🌐 Run on Chrome
-
-```bash
-flutter run -d chrome
-```
-
----
-
-# ⚡ Hot reload
-
-While the application is running:
-
-```txt
-r
-```
-
-🔄 Hot reload.
-
-```txt
-R
-```
-
-♻️ Hot restart.
-
-```txt
-q
-```
-
-❌ Quit application.
-
----
-
-# 🛠️ Common issues
-
-## ❗ Android cmdline-tools component is missing
-
-Open Android Studio:
-
-```txt
-SDK Manager → SDK Tools
-```
-
-Install:
-
-```txt
-Android SDK Command-line Tools (latest)
-```
-
-Then run:
-
-```bash
-flutter doctor
-```
-
----
-
-## ❗ Android license status unknown
-
-Run:
-
-```bash
-flutter doctor --android-licenses
-```
-
-Accept all licenses.
-
----
-
-## ❗ Visual Studio not installed
-
-This warning only affects Windows desktop builds.
-
-It is NOT required for Android emulator development.
-
-You can ignore it unless you want to run:
-
-```bash
-flutter run -d windows
-```
-
----
-
-# 🧰 Useful commands
-
-## 📦 Install dependencies
-
-```bash
-flutter pub get
-```
-
-## 🧹 Clean project
-
-```bash
-flutter clean
-```
-
-## 🩺 Check Flutter installation
-
-```bash
-flutter doctor
-```
-
-## 🔌 List devices
-
-```bash
-flutter devices
-```
-
-## ▶️ Run application
-
-```bash
-flutter run
-```
-
----
-
-# 🧩 Recommended VS Code extensions
-
-Install:
-
-- Flutter
-- Dart
-- Error Lens
-- GitLens
-
----
-
-# 🏗️ Recommended project structure
-
-```txt
+# Flutter Base App 📱
+
+Reusable Flutter application template built around a `core + features` structure, global request feedback handling, authentication flow, localized UI, modular shell navigation and CI-ready quality tooling.
+
+It is intended to be a practical starter for API-driven Flutter apps without overengineering the project into excessive layers.
+
+## ℹ️ Summary
+
+- Framework: Flutter
+- Language: Dart
+- State management: `flutter_bloc`
+- Dependency injection: `get_it`
+- HTTP: `http` + `http_interceptor`
+- Local storage: `shared_preferences`
+- Environment configuration: `flutter_dotenv`
+- Localization: `flutter_localizations` + generated `l10n`
+- Global loading and dialogs: `loader_overlay` + request feedback coordinator
+- Testing: `flutter_test` + `integration_test`
+- Coverage: `flutter test --coverage`
+- Code quality: SonarQube
+- CI/CD: GitLab CI/CD
+
+## 🗂️ Main structure
+
+The project follows a lightweight `app + core + features` organization:
+
+- `lib/app/`: application shell, global bloc, routes, config and theme
+- `lib/core/`: shared infrastructure and reusable technical utilities
+- `lib/core/di/`: dependency registration with `get_it`
+- `lib/core/network/`: HTTP client factory, interceptor, request tracker and feedback coordinator
+- `lib/core/dialogs/`: dialog service
+- `lib/core/storage/`: local persistence helpers
+- `lib/core/utils/`: small reusable utilities
+- `lib/core/validators/`: shared form validators
+- `lib/features/`: business and UI modules grouped by feature
+- `lib/features/auth/`: login models, service, repository, bloc, controller and auth view
+- `lib/features/home/`: authenticated shell and home module UI
+- `lib/features/users/`: example users module view
+- `lib/features/cities/`: example cities module view
+- `lib/features/meteo_stations/`: example meteo stations module view
+- `lib/l10n/`: localization source files and generated localizations
+- `test/`: unit and widget tests
+- `integration_test/`: integration-style app flow tests
+- `scripts/`: helper scripts for coverage and test execution
+
+Example structure:
+
+```text
 lib/
- ├── core/
- ├── features/
- ├── shared/
- ├── services/
- ├── models/
- ├── routes/
- └── main.dart
-
-android/
-ios/
-web/
-windows/
-pubspec.yaml
-README.md
-```
-
----
-
-# 📂 Project structure
-
-```txt
-flutter_base_app/
- ├── android/
- ├── ios/
- ├── lib/
- ├── test/
- ├── web/
- ├── windows/
- ├── pubspec.yaml
- └── README.md
-```
-
----
-
-# 🧹 Remove unused Flutter platforms
-
-Flutter is a multi-platform framework. A project can include support for several target platforms, even if the application is only going to be distributed for some of them.
-
-Removing platforms that are not needed helps to:
-
-- Reduce project complexity
-- Avoid unnecessary build errors
-- Simplify CI/CD pipelines
-- Reduce tooling requirements
-- Keep the repository focused on the real target platforms
-
----
-
-# 🧩 Flutter supported platforms
-
-Flutter projects can include the following platform folders:
-
-```txt
-android/   → Android applications
-ios/       → iOS applications
-web/       → Web applications
-windows/   → Windows desktop applications
-macos/     → macOS desktop applications
-linux/     → Linux desktop applications
-```
-
-The shared Dart application code is usually located in:
-
-```txt
-lib/
+  app/
+    bloc/
+    config/
+    routes/
+    theme/
+    app.dart
+  core/
+    dialogs/
+    di/
+    network/
+    storage/
+    utils/
+    validators/
+  features/
+    auth/
+      models/
+      presentation/
+        bloc/
+        controllers/
+        views/
+      repositories/
+      services/
+    home/
+      presentation/
+        views/
+    users/
+      presentation/
+        views/
+    cities/
+      presentation/
+        views/
+    meteo_stations/
+      presentation/
+        views/
+  l10n/
 test/
+  app/
+  core/
+  features/
+integration_test/
+  features/
+scripts/
+.env.test
+.gitlab-ci.yml
 pubspec.yaml
+sonar-project.properties
 ```
 
-These files and folders should normally be kept regardless of the target platforms.
+## 🧱 Architecture
 
----
+This template is intentionally not “clean architecture for everything”. It uses a pragmatic split:
 
-# ✅ Check enabled platforms
+- `app/` for shell-level concerns
+- `core/` for shared infrastructure
+- `features/` for domain-specific code
 
-To see which platforms are currently enabled in your Flutter SDK, run:
+### 🏠 App shell
 
-```bash
-flutter config
-```
+The authenticated part of the app is modeled as a shell:
 
-You can also list available devices with:
+- `AuthBloc` decides whether the app shows the login flow or the authenticated shell
+- `AppBloc` manages the authenticated shell modules and their navigation history
+- `HomeView` renders the current active module
 
-```bash
-flutter devices
-```
+Top-level modules are not pushed through `Navigator` routes. They are selected through shell state.
 
----
+Current example modules:
 
-# 📌 Remove a platform from the project
+- `home`
+- `users`
+- `cities`
+- `meteo_stations`
+- `logout`
 
-To remove support for a platform, delete its folder from the root of the project.
+### 🔙 Module back stack
 
-For example, to remove Web support:
-
-```txt
-web/
-```
-
-To remove Windows desktop support:
-
-```txt
-windows/
-```
-
-To remove iOS support:
-
-```txt
-ios/
-```
-
-After deleting the platform folder, run:
-
-```bash
-flutter clean
-flutter pub get
-```
-
----
-
-# ⚙️ Disable platform support in Flutter config
-
-In addition to deleting the platform folder from the project, you can disable platform support globally in your Flutter SDK configuration.
-
-## Disable Web
-
-```bash
-flutter config --no-enable-web
-```
-
-## Disable Windows desktop
-
-```bash
-flutter config --no-enable-windows-desktop
-```
-
-## Disable Linux desktop
-
-```bash
-flutter config --no-enable-linux-desktop
-```
-
-## Disable macOS desktop
-
-```bash
-flutter config --no-enable-macos-desktop
-```
-
-## Disable iOS
-
-```bash
-flutter config --no-enable-ios
-```
-
-> Android is normally kept enabled because it is one of the most common Flutter targets.
-
----
-
-# 🔄 Re-enable a platform later
-
-If a removed platform is needed again, enable it and regenerate the platform folder.
-
-## Re-enable Web
-
-```bash
-flutter config --enable-web
-flutter create .
-```
-
-## Re-enable Windows desktop
-
-```bash
-flutter config --enable-windows-desktop
-flutter create .
-```
-
-## Re-enable Linux desktop
-
-```bash
-flutter config --enable-linux-desktop
-flutter create .
-```
-
-## Re-enable macOS desktop
-
-```bash
-flutter config --enable-macos-desktop
-flutter create .
-```
-
-## Re-enable iOS
-
-```bash
-flutter config --enable-ios
-flutter create .
-```
-
----
-
-# 📂 Example project structures
-
-## Project with all common platforms
-
-```txt
-flutter_base_app/
- ├── android/
- ├── ios/
- ├── lib/
- ├── linux/
- ├── macos/
- ├── test/
- ├── web/
- ├── windows/
- ├── pubspec.yaml
- └── README.md
-```
-
-## Project with only selected platforms
-
-Example keeping only Android and Web:
-
-```txt
-flutter_base_app/
- ├── android/
- ├── lib/
- ├── test/
- ├── web/
- ├── pubspec.yaml
- └── README.md
-```
-
-Example keeping only Android:
-
-```txt
-flutter_base_app/
- ├── android/
- ├── lib/
- ├── test/
- ├── pubspec.yaml
- └── README.md
-```
-
----
-
-# ⚠️ Tooling notes
-
-Some platforms require additional tooling:
-
-- Android requires Android Studio / Android SDK
-- iOS and macOS require XCode
-- Windows requires Visual Studio with desktop C++ tooling
-- Web requires Chrome or another supported browser
-- Linux requires Linux desktop build dependencies
-
-If a platform is removed from the project, its specific tooling is no longer needed unless another project requires it.
-
----
-
-# 💡 Recommendation
-
-Only keep the platforms that are actually required by the product.
-
-For example:
-
-```txt
-android/
-ios/
-```
-
-or:
-
-```txt
-android/
-web/
-```
-
-or:
-
-```txt
-windows/
-```
-
-This keeps the repository easier to maintain and avoids platform-specific issues that are not relevant to the application.
-
----
-
-# 📦 Generate application builds for all platforms
-
-Flutter can generate distributable builds for all supported target platforms.
-
-Before generating any build, it is recommended to clean the project:
-
-```bash
-flutter clean
-flutter pub get
-```
-
----
-
-# 🤖 Android builds
-
-## Generate APK
-
-### Debug APK
-
-```bash
-flutter build apk --debug
-```
-
-### Release APK
-
-```bash
-flutter build apk --release
-```
-
-Generated files:
-
-```txt
-build/app/outputs/flutter-apk/
-```
+The app keeps a module history stack in `AppBloc`.
 
 Example:
 
-```txt
-app-debug.apk
-app-release.apk
+```text
+Users -> Cities -> Meteo Stations
+Back -> Cities
+Back -> Users
+Back -> Auth
+Back -> exits app
 ```
 
----
+This is implemented with:
 
-## Generate Android App Bundle (Google Play)
+- `SetModule`
+- `PopModule`
+- `moduleHistory`
+- `PopScope` in `HomeView`
+
+### 🔐 Authentication flow
+
+Authentication is split into:
+
+- `AuthService`: direct HTTP communication
+- `AuthRepository`: coordinates auth API + local token storage
+- `AuthBloc`: login/logout state transitions
+- `AuthController`: form handling and event dispatch
+- `AuthView`: login UI
+
+Successful login stores the session token locally and switches the app from `AuthView` to the authenticated shell.
+
+### 🌐 Global request feedback
+
+The template includes a global request feedback pipeline:
+
+- `HttpInterceptor`: request/response decoration, logging and API error normalization
+- `TrackingHttpClient`: tracks request lifecycle and success/error outcomes
+- `RequestTracker`: aggregates concurrent request state and messages
+- `RequestFeedbackCoordinator`: translates tracker events into UI feedback
+- `DialogService`: shared dialogs
+- `loader_overlay`: global loading indicator
+
+This allows the app to:
+
+- show a global loader during requests
+- aggregate request errors in a single dialog
+- show success feedback for non-GET, non-auth successful operations
+
+## ✅ Requirements
+
+- Flutter SDK `3.44.x` or compatible
+- Dart SDK `3.12.x` or compatible
+- Android Studio / VS Code / IntelliJ
+- An emulator or physical device for app execution
+- SonarQube, if using local Sonar analysis
+- GitLab Runner, if using the provided CI/CD pipeline
+
+### 🪟 Windows note
+
+Some Flutter plugins require symlink support on Windows.
+
+If Flutter asks for symlink support, enable Developer Mode:
+
+```powershell
+start ms-settings:developers
+```
+
+## 🌱 Environment files
+
+The app loads environment values from `.env`.
+
+Committed test-safe file:
+
+- `.env.test`
+
+Typical local flow:
+
+1. create your own `.env`
+2. keep `.env.test` for CI and predictable test jobs
+
+Example `.env.test`:
+
+```env
+APP_NAME=Flutter Base App
+APP_ENVIRONMENT=test
+API_URL=http://127.0.0.1:3000/api/v1
+```
+
+Main values currently used:
+
+- `APP_NAME`: application display name
+- `APP_ENVIRONMENT`: `dev`, `test` or `prod`
+- `API_URL`: backend base URL
+
+## 🚀 Development startup
+
+Install dependencies:
 
 ```bash
-flutter build appbundle --release
+flutter pub get
 ```
 
-Generated file:
-
-```txt
-build/app/outputs/bundle/release/app-release.aab
-```
-
----
-
-# 🍎 iOS builds
-
-> Requires macOS and XCode installed.
-
-## Generate iOS release build
+Run the app:
 
 ```bash
-flutter build ipa
+flutter run
 ```
 
-Generated files are located under:
-
-```txt
-build/ios/
-```
-
----
-
-# 🌐 Web builds
-
-## Generate production web build
+Run on a specific device:
 
 ```bash
-flutter build web
+flutter devices
+flutter run -d <deviceId>
 ```
 
-Generated files:
-
-```txt
-build/web/
-```
-
-These files can be deployed to:
-
-- Nginx
-- Apache
-- Firebase Hosting
-- GitHub Pages
-- Azure
-- AWS S3
-- Any static hosting provider
-
----
-
-# 🪟 Windows desktop builds
-
-> Requires Visual Studio with Desktop Development tools installed.
-
-## Generate Windows executable
+Generate localizations if needed:
 
 ```bash
-flutter build windows
+flutter gen-l10n
 ```
 
-Generated files:
+## 🏷️ App version
 
-```txt
-build/windows/
+The authentication screen shows the app version in its bottom bar.
+
+The version is taken from `pubspec.yaml` through `package_info_plus`.
+
+Example:
+
+```yaml
+version: 1.0.0+1
 ```
 
----
+Displayed as:
 
-# 🍎 macOS desktop builds
-
-> Requires macOS and XCode installed.
-
-## Generate macOS desktop application
-
-```bash
-flutter build macos
+```text
+v1.0.0+1
 ```
 
-Generated files:
+## 🌍 Localization
 
-```txt
-build/macos/
-```
+Localization is defined in:
 
----
+- `lib/l10n/app_en.arb`
+- `lib/l10n/app_es.arb`
 
-# 🐧 Linux desktop builds
+Generated files are placed in:
 
-> Requires Linux desktop build dependencies installed.
+- `lib/l10n/app_localizations.dart`
+- `lib/l10n/app_localizations_en.dart`
+- `lib/l10n/app_localizations_es.dart`
 
-## Generate Linux desktop application
+## 🧪 Testing
 
-```bash
-flutter build linux
-```
+The project keeps regular tests and integration-style tests separated.
 
-Generated files:
+### 🧩 Unit and widget tests
 
-```txt
-build/linux/
-```
+Location:
 
----
-
-# 🧪 Run application in release mode
-
-Flutter can run applications directly in release mode without manually installing the generated build.
-
-## Android
-
-```bash
-flutter run --release
-```
-
-## Web
-
-```bash
-flutter run -d chrome --release
-```
-
-## Windows
-
-```bash
-flutter run -d windows --release
-```
-
-## macOS
-
-```bash
-flutter run -d macos --release
-```
-
-## Linux
-
-```bash
-flutter run -d linux --release
-```
-
----
-
-# ⚠️ Platform requirements
-
-Each platform requires its own tooling and SDKs.
-
-| Platform | Required tooling                  |
-| -------- | --------------------------------- |
-| Android  | Android Studio + Android SDK      |
-| iOS      | macOS + XCode                     |
-| macOS    | XCode                             |
-| Windows  | Visual Studio Desktop Development |
-| Linux    | Linux build dependencies          |
-| Web      | Supported browser                 |
-
----
-
-# 🩺 Verify platform setup
-
-Use:
-
-```bash
-flutter doctor -v
-```
-
-Flutter will show missing SDKs, licenses, or build tools for each enabled platform.
-
----
-
-# Testing
-
-This project separates fast `flutter test` suites from heavier app flow tests.
-
-## Test structure
-
-```txt
+```text
 test/
- ├── app/
- ├── core/
- ├── features/
- └── widget_test.dart
-
-integration_test/
- └── features/
-     └── auth/
 ```
 
-## Unit and widget tests
-
-These are the tests executed by the default Flutter runner:
+Run all regular tests:
 
 ```bash
 flutter test
 ```
 
-To generate coverage for this suite:
+Run with coverage:
 
 ```bash
 flutter test --coverage
 ```
 
-PowerShell helper:
+Coverage report:
 
-```powershell
-.\scripts\run_coverage.ps1
+```text
+coverage/lcov.info
 ```
 
-## Integration tests
+### 🔄 Integration tests
 
-Authentication flow tests live under `integration_test/` and are executed separately:
+Location:
+
+```text
+integration_test/
+```
+
+Run integration tests:
 
 ```bash
 flutter test integration_test
 ```
 
-PowerShell helper:
+Current integration flows include:
+
+- auth flow
+- home shell back navigation flow
+
+### 📊 Coverage notes
+
+Coverage in Flutter/Dart can under-report some files made only of compile-time constants.
+
+Typical examples:
+
+- route constant files
+- color constant files
+- layout constant files
+
+For that reason, `sonar.coverage.exclusions` excludes some low-signal constant-only files.
+
+## 🛠️ Scripts
+
+Available helper scripts:
+
+- `scripts/run_coverage.ps1`
+- `scripts/run_integration_tests.ps1`
+
+Examples:
 
 ```powershell
+.\scripts\run_coverage.ps1
 .\scripts\run_integration_tests.ps1
 ```
 
-## Why they are separate
+## 📘 SonarQube
 
-`flutter test --coverage` is intended for the regular `test/` suite.
-Keeping heavier app-flow tests in `integration_test/` avoids hangs and makes coverage runs more stable.
+SonarQube configuration lives in:
+
+```text
+sonar-project.properties
+```
+
+Configured for:
+
+- `lib` as sources
+- `test` and `integration_test` as tests
+- `coverage/lcov.info` as coverage input
+
+Main exclusions:
+
+- generated localization files
+- build artifacts
+- platform folders
+- some constant-only files that distort coverage
+
+## 🔁 GitLab CI/CD
+
+The project includes a GitLab pipeline in:
+
+```text
+.gitlab-ci.yml
+```
+
+Pipeline stages:
+
+```text
+dependencies -> analyze -> test -> build -> sonar
+```
+
+### 📦 `dependencies`
+
+Installs Flutter dependencies:
+
+```bash
+flutter pub get
+```
+
+### 🔎 `analyze`
+
+Runs static analysis:
+
+```bash
+flutter analyze
+```
+
+The pipeline copies `.env.test` to `.env` before analysis so Flutter does not fail on the declared `.env` asset.
+
+### 🧪 `test`
+
+Runs the regular test suite with coverage:
+
+```bash
+flutter test --coverage
+```
+
+It then computes the global percentage from `coverage/lcov.info` and validates it against:
+
+```text
+MIN_COVERAGE_PERCENTAGE
+```
+
+If coverage is below the configured minimum, the job fails.
+
+### 🏗️ `build`
+
+Builds an Android debug APK:
+
+```bash
+flutter build apk --debug
+```
+
+### 📈 `sonar`
+
+Runs SonarScanner using:
+
+- `SONAR_HOST_URL`
+- `SONAR_TOKEN`
+
+The scanner uses `sonar-project.properties` plus the coverage artifact generated by the `test` stage.
+
+### 🔐 Required GitLab CI/CD variables
+
+Configure these in:
+
+```text
+Project > Settings > CI/CD > Variables
+```
+
+Required variables:
+
+- `MIN_COVERAGE_PERCENTAGE`
+- `SONAR_HOST_URL`
+- `SONAR_TOKEN`
+
+Recommended behavior:
+
+- mark `SONAR_TOKEN` as masked
+- mark sensitive variables as protected if needed
+
+### 🚦 Pipeline execution rules
+
+The current pipeline is intended to run on:
+
+- merge requests
+- `develop`
+- `main`
+
+## 📚 Main dependencies
+
+Runtime dependencies:
+
+- `flutter_bloc`: state management
+- `bloc`: core bloc primitives
+- `get_it`: dependency injection / service locator
+- `http`: HTTP client
+- `http_interceptor`: request/response interception
+- `flutter_dotenv`: environment loading
+- `shared_preferences`: local storage
+- `logger`: console logging
+- `loader_overlay`: global loading overlay
+- `equatable`: value equality
+- `intl`: localization/date formatting
+- `package_info_plus`: app version metadata
+
+Development dependencies:
+
+- `flutter_test`: testing
+- `integration_test`: integration-style testing
+- `flutter_lints`: recommended lints
+
+## 📏 Conventions
+
+- Put shared infrastructure in `lib/core`
+- Put shell-level concerns in `lib/app`
+- Put business-specific code in `lib/features/<feature>`
+- Keep top-level modules simple and render them through shell state
+- Use normal route navigation only for deeper feature flows when needed
+- Keep HTTP and UI feedback separated:
+  - interceptor/tracker normalize and collect
+  - coordinator/dialogs render feedback
+- Keep auth concerns inside `AuthBloc`, not spread across unrelated blocs
+
+## 🧩 Creating a new feature
+
+A lightweight feature usually looks like:
+
+```text
+lib/features/<feature>/
+  presentation/
+    views/
+```
+
+If the feature grows, add:
+
+```text
+lib/features/<feature>/
+  models/
+  presentation/
+    bloc/
+    controllers/
+    views/
+  repositories/
+  services/
+```
+
+Recommended steps:
+
+1. create the feature view
+2. add services/repository if the feature talks to the API
+3. add bloc only if the feature has real async or business state
+4. register the feature as a shell module if it is top-level
+5. add tests
+
+## 📝 Notes
+
+- This template is meant to stay practical and team-friendly.
+- It intentionally avoids excessive “use case per file” architecture.
+- Example modules can be replaced or extended for real projects.
+- The shell module system is state-driven, not route-stack-driven.
+- Back behavior between top-level modules is managed by `AppBloc` history.
