@@ -10,6 +10,7 @@ default:
   before_script:
     - flutter --version
     - dart --version
+    - cp .env.test .env
 
 variables:
   PUB_CACHE: "$CI_PROJECT_DIR/.pub-cache"
