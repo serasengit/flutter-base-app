@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_base_app/app/app.dart';
 import 'package:flutter_base_app/app/config/app_config.dart';
 import 'package:flutter_base_app/core/di/injectable.dart';
@@ -9,7 +8,9 @@ import 'package:flutter_base_app/features/auth/presentation/bloc/auth_bloc.dart'
 import 'package:flutter_base_app/features/auth/repositories/auth_repository.dart';
 import 'package:flutter_base_app/features/auth/services/auth_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -38,7 +39,8 @@ Future<void> bootstrapTestApp(
   );
 
   await tester.pumpWidget(const App());
-  await tester.pumpAndSettle();
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 100));
 }
 
 Future<void> _resetDependencies() async {
@@ -61,6 +63,7 @@ void _overrideAuthGraph({
       authToReturn: authToReturn,
       loginError: loginError,
       onLogout: onLogout,
+      client: getIt<http.Client>(),
     ),
   );
 
@@ -72,10 +75,8 @@ void _overrideAuthGraph({
   );
 
   getIt.registerLazySingleton<AuthBloc>(
-    () => AuthBloc(
-      repository: getIt<AuthRepository>(),
-      logger: getIt<Logger>(),
-    ),
+    () =>
+        AuthBloc(repository: getIt<AuthRepository>(), logger: getIt<Logger>()),
   );
 }
 

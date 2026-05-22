@@ -31,14 +31,16 @@ void main() {
       description: 'Success description',
       type: DialogType.success,
     );
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('Success title'), findsOneWidget);
     expect(find.text('Success description'), findsOneWidget);
     expect(find.byKey(const Key('closeDialog')), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('closeDialog')));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
     await dialogFuture;
 
     expect(find.text('Success title'), findsNothing);
@@ -57,7 +59,8 @@ void main() {
       title: 'Request failed',
       messages: <String>['One issue', 'One issue', 'Second issue'],
     );
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('Request failed'), findsOneWidget);
     expect(find.text('- One issue'), findsOneWidget);
@@ -65,7 +68,8 @@ void main() {
     expect(find.byKey(const Key('requestErrorsDialog')), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('requestErrorsDialog')));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
     await dialogFuture;
   });
 }

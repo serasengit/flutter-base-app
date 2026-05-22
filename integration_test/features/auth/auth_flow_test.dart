@@ -32,7 +32,8 @@ void main() {
       final l10n = AppLocalizations.of(context)!;
 
       await tester.tap(find.widgetWithText(ElevatedButton, l10n.login));
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.text(l10n.required_field), findsNWidgets(2));
     });
@@ -60,7 +61,8 @@ void main() {
       await tester.enterText(find.byType(TextFormField).at(0), 'tester');
       await tester.enterText(find.byType(TextFormField).at(1), 'secret');
       await tester.tap(find.widgetWithText(ElevatedButton, authL10n.login));
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       final homeContext = tester.element(find.byType(HomePage));
       final homeL10n = AppLocalizations.of(homeContext)!;
@@ -69,7 +71,8 @@ void main() {
       expect(find.text(homeL10n.home), findsWidgets);
 
       await tester.tap(find.byIcon(Icons.menu));
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.text(homeL10n.users), findsOneWidget);
       expect(find.text(homeL10n.cities), findsOneWidget);
@@ -77,7 +80,8 @@ void main() {
       expect(find.text(homeL10n.logout), findsOneWidget);
 
       await tester.tap(find.text(homeL10n.logout));
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.byType(AuthView), findsOneWidget);
       expect(find.text(authL10n.sign_in), findsOneWidget);

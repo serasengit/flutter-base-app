@@ -110,20 +110,24 @@ void main() {
         ..add(SetModule(module: usersModule))
         ..add(SetModule(module: citiesModule))
         ..add(SetModule(module: meteoStationsModule));
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       expect(appBloc.state.module, meteoStationsModule);
 
       await tester.binding.handlePopRoute();
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
       expect(appBloc.state.module, citiesModule);
 
       await tester.binding.handlePopRoute();
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
       expect(appBloc.state.module, usersModule);
 
       await tester.binding.handlePopRoute();
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
       expect(authBloc.receivedEvents, <AuthEvent>[const LogOut()]);
     });
   });

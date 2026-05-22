@@ -71,12 +71,14 @@ void main() {
 
   testWidgets('drawer shows available modules', (tester) async {
     await tester.pumpWidget(_buildHome(appBloc, authBloc));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
 
     final l10n = AppLocalizations.of(tester.element(find.byType(HomeView)))!;
 
     await tester.tap(find.byIcon(Icons.menu));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text(l10n.users), findsOneWidget);
     expect(find.text(l10n.cities), findsOneWidget);
@@ -102,15 +104,16 @@ void main() {
         ],
       ),
     );
-    await Future<void>.delayed(Duration.zero);
 
     await tester.pumpWidget(_buildHome(appBloc, authBloc));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
 
     final l10n = AppLocalizations.of(tester.element(find.byType(HomeView)))!;
 
     await tester.tap(find.byIcon(Icons.menu));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text(l10n.users), findsOneWidget);
     expect(find.text(l10n.cities), findsNothing);

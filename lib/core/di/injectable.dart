@@ -88,7 +88,10 @@ void configureDependencies() {
   locator.registerLazySingleton<DialogService>(() => DialogService());
 
   // Global request tracker
-  locator.registerLazySingleton<RequestTracker>(() => RequestTracker());
+  locator.registerLazySingleton<RequestTracker>(
+    () => RequestTracker(),
+    dispose: (tracker) => tracker.dispose(),
+  );
 
   // Global request feedback controller
   locator.registerLazySingleton<RequestFeedbackCoordinator>(
@@ -96,6 +99,7 @@ void configureDependencies() {
       requestTracker: locator<RequestTracker>(),
       dialogService: locator<DialogService>(),
     ),
+    dispose: (coordinator) => coordinator.dispose(),
   );
 
   // HTTP interceptor
@@ -107,7 +111,10 @@ void configureDependencies() {
   );
 
   // Shared HTTP client configured with interception and request tracking
-  locator.registerLazySingleton<http.Client>(() => HttpClientFactory.create());
+  locator.registerLazySingleton<http.Client>(
+    () => HttpClientFactory.create(),
+    dispose: (client) => client.close(),
+  );
 
   // Services
   locator.registerLazySingleton<AuthService>(
@@ -123,12 +130,16 @@ void configureDependencies() {
   );
 
   // Global blocs
-  locator.registerLazySingleton<AppBloc>(() => AppBloc());
+  locator.registerLazySingleton<AppBloc>(
+    () => AppBloc(),
+    dispose: (bloc) => bloc.close(),
+  );
 
   locator.registerLazySingleton<AuthBloc>(
     () => AuthBloc(
       repository: locator<AuthRepository>(),
       logger: locator<Logger>(),
     ),
+    dispose: (bloc) => bloc.close(),
   );
 }

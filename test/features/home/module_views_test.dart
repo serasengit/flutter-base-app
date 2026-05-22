@@ -17,7 +17,7 @@ Widget _buildApp(Widget child) {
 void main() {
   testWidgets('HomeModuleView renders localized content', (tester) async {
     await tester.pumpWidget(_buildApp(const HomeModuleView()));
-    await tester.pumpAndSettle();
+    await tester.pump();
 
     final l10n = AppLocalizations.of(tester.element(find.byType(HomeModuleView)))!;
 
@@ -27,7 +27,7 @@ void main() {
 
   testWidgets('UsersView renders localized content', (tester) async {
     await tester.pumpWidget(_buildApp(const UsersView()));
-    await tester.pumpAndSettle();
+    await tester.pump();
 
     final l10n = AppLocalizations.of(tester.element(find.byType(UsersView)))!;
 
@@ -37,7 +37,7 @@ void main() {
 
   testWidgets('CitiesView renders localized content', (tester) async {
     await tester.pumpWidget(_buildApp(const CitiesView()));
-    await tester.pumpAndSettle();
+    await tester.pump();
 
     final l10n = AppLocalizations.of(tester.element(find.byType(CitiesView)))!;
 
@@ -47,7 +47,7 @@ void main() {
 
   testWidgets('MeteoStationsView renders localized content', (tester) async {
     await tester.pumpWidget(_buildApp(const MeteoStationsView()));
-    await tester.pumpAndSettle();
+    await tester.pump();
 
     final l10n = AppLocalizations.of(
       tester.element(find.byType(MeteoStationsView)),

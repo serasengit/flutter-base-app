@@ -8,12 +8,14 @@ class FakeAuthService extends AuthService {
     this.loginError,
     this.onLogin,
     this.onLogout,
+    required super.client,
   });
 
   final Auth? authToReturn;
   final Exception? loginError;
   final Future<void> Function(Login login)? onLogin;
   final Future<void> Function()? onLogout;
+  
 
   @override
   Future<Auth> login(Login login) async {
