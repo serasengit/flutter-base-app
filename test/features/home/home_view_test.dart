@@ -9,10 +9,20 @@ import 'package:flutter_base_app/features/home/presentation/views/home_view.dart
 import 'package:flutter_base_app/l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+class _UnusedClient extends http.BaseClient {
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) {
+    throw UnimplementedError('This fake AuthService should not send HTTP requests.');
+  }
+}
+
 class _FakeAuthService extends AuthService {
+  _FakeAuthService() : super(client: _UnusedClient());
+
   @override
   Future<void> logout() async {}
 }

@@ -6,13 +6,21 @@ import 'package:flutter_base_app/features/auth/models/user.dart';
 import 'package:flutter_base_app/features/auth/repositories/auth_repository.dart';
 import 'package:flutter_base_app/features/auth/services/auth_service.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
+class _UnusedClient extends http.BaseClient {
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) {
+    throw UnimplementedError('This fake AuthService should not send HTTP requests.');
+  }
+}
 
 class _FakeAuthService extends AuthService {
   _FakeAuthService({
     required this.authToReturn,
     this.onLogout,
-  });
+  }) : super(client: _UnusedClient());
 
   final Auth authToReturn;
   final void Function()? onLogout;

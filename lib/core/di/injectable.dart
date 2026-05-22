@@ -1,5 +1,6 @@
 import 'package:flutter_base_app/app/bloc/app_bloc.dart';
 import 'package:flutter_base_app/core/dialogs/dialog_service.dart';
+import 'package:flutter_base_app/core/network/http_client_factory.dart';
 import 'package:flutter_base_app/core/network/http_interceptor.dart';
 import 'package:flutter_base_app/core/network/request_feedback_coordinator.dart';
 import 'package:flutter_base_app/core/network/request_tracker.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_base_app/features/auth/presentation/bloc/auth_bloc.dart'
 import 'package:flutter_base_app/features/auth/repositories/auth_repository.dart';
 import 'package:flutter_base_app/features/auth/services/auth_service.dart';
 import 'package:get_it/get_it.dart';
+import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
 /// Dependency injection container.
@@ -96,8 +98,13 @@ void configureDependencies() {
     ),
   );
 
+  // Shared HTTP client configured with interception and request tracking
+  locator.registerLazySingleton<http.Client>(() => HttpClientFactory.create());
+
   // Services
-  locator.registerLazySingleton<AuthService>(() => AuthService());
+  locator.registerLazySingleton<AuthService>(
+    () => AuthService(client: locator<http.Client>()),
+  );
 
   // Repositories
   locator.registerLazySingleton<AuthRepository>(

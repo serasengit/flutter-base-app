@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter_base_app/app/config/app_config.dart';
-import 'package:flutter_base_app/core/network/http_client_factory.dart';
 import 'package:flutter_base_app/features/auth/models/auth.dart';
 import 'package:flutter_base_app/features/auth/models/login.dart';
 import 'package:http/http.dart' as http;
@@ -14,8 +13,7 @@ import 'package:http/http.dart' as http;
 class AuthService {
   final http.Client _client;
 
-  AuthService({http.Client? client})
-    : _client = client ?? HttpClientFactory.create();
+  AuthService({required http.Client client}) : _client = client;
 
   ///
   /// Sends login credentials to the backend.
