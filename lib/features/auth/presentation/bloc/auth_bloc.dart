@@ -11,9 +11,29 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final Logger logger;
 
   AuthBloc({required this.repository, required this.logger})
-    : super(const AuthState()) {
+    : super(const AuthState(isBootstrapping: true)) {
+    on<RestoreSession>(_restoreSession);
     on<LogIn>(_logIn);
     on<LogOut>(_logOut);
+  }
+
+  /// Restores a previously persisted session during app startup.
+  Future<void> _restoreSession(
+    RestoreSession event,
+    Emitter<AuthState> emit,
+  ) async {
+    try {
+      final auth = await repository.restoreSession();
+      emit(AuthState(auth: auth, isBootstrapping: false));
+    } catch (error, stackTrace) {
+      logger.e(
+        'Failed to restore persisted session',
+        error: error,
+        stackTrace: stackTrace,
+      );
+
+      emit(const AuthState(isBootstrapping: false));
+    }
   }
 
   /// Executes the login flow and stores the authenticated session in state.
@@ -23,17 +43,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         Login(username: event.username, password: event.password),
       );
 
-      emit(state.copyWith(auth: auth));
+      emit(state.copyWith(auth: auth, isBootstrapping: false));
     } catch (error, stackTrace) {
       logger.e('Authentication failed', error: error, stackTrace: stackTrace);
 
-      emit(const AuthState());
+      emit(const AuthState(isBootstrapping: false));
     }
   }
 
   /// Clears the persisted session and resets auth state.
   Future<void> _logOut(LogOut event, Emitter<AuthState> emit) async {
     await repository.logout();
-    emit(const AuthState());
+    emit(const AuthState(isBootstrapping: false));
   }
 }

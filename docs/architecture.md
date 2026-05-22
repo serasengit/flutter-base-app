@@ -13,7 +13,8 @@ Key libraries currently used in the template:
 - `equatable` for value equality in bloc events and states
 - `http` for API communication
 - `http_interceptor` for request decoration and API error normalization
-- `shared_preferences` for local persistence such as session data
+- `flutter_secure_storage` for sensitive persistence such as auth tokens
+- `shared_preferences` for non-sensitive local persistence such as serialized session data and app settings
 - `flutter_dotenv` for runtime configuration loaded from `.env`
 - `intl` and `flutter_localizations` for localization and formatting
 - `loader_overlay` for global loading feedback
@@ -86,10 +87,13 @@ Use normal route navigation only when a feature needs deeper internal flows such
 Authentication is split into:
 
 - `AuthService`: direct HTTP communication
-- `AuthRepository`: service + local storage coordination
-- `AuthBloc`: login/logout state transitions
+- `AuthRepository`: service + local storage coordination, including persisted session restore
+- `AuthBloc`: startup restore, login/logout state transitions
 - `AuthController`: form handling
 - `AuthView`: login UI
+
+On app startup, `AuthBloc` restores any persisted session before the app decides
+between the auth screen and the authenticated shell.
 
 Important rule:
 

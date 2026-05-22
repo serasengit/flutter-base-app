@@ -9,6 +9,7 @@ import 'package:flutter_base_app/features/auth/presentation/bloc/auth_state.dart
 import 'package:flutter_base_app/features/auth/repositories/auth_repository.dart';
 import 'package:flutter_base_app/features/auth/services/auth_service.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -59,6 +60,7 @@ void main() {
 
   setUp(() {
     SharedPreferences.setMockInitialValues(<String, Object>{});
+    FlutterSecureStorage.setMockInitialValues(<String, String>{});
     configureDependencies();
     storageService = StorageService();
     logger = Logger();
@@ -73,13 +75,16 @@ void main() {
 
     final expectation = expectLater(
       bloc.stream,
-      emitsInOrder(<Matcher>[equals(const AuthState(auth: auth))]),
+      emitsInOrder(<Matcher>[
+        equals(const AuthState(auth: auth, isBootstrapping: false)),
+      ]),
     );
 
     bloc.add(const LogIn(username: 'tester', password: 'secret'));
 
     await expectation;
     expect(await storageService.getAuthToken(), 'token');
+    expect((await storageService.getAuthSession())?.user.username, 'tester');
     await bloc.close();
   });
 
@@ -92,13 +97,36 @@ void main() {
 
     final expectation = expectLater(
       bloc.stream,
-      emitsInOrder(<Matcher>[equals(const AuthState())]),
+      emitsInOrder(<Matcher>[
+        equals(const AuthState(isBootstrapping: false)),
+      ]),
     );
 
     bloc.add(const LogIn(username: 'tester', password: 'secret'));
 
     await expectation;
     expect(await storageService.getAuthToken(), isNull);
+    await bloc.close();
+  });
+
+  test('restores persisted session on startup event', () async {
+    await storageService.saveAuthSession(auth);
+    final repository = AuthRepository(
+      authService: _FakeAuthService(authToReturn: auth),
+      storageService: storageService,
+    );
+    final bloc = AuthBloc(repository: repository, logger: logger);
+
+    final expectation = expectLater(
+      bloc.stream,
+      emitsInOrder(<Matcher>[
+        equals(const AuthState(auth: auth, isBootstrapping: false)),
+      ]),
+    );
+
+    bloc.add(const RestoreSession());
+
+    await expectation;
     await bloc.close();
   });
 
@@ -118,7 +146,9 @@ void main() {
 
     final expectation = expectLater(
       bloc.stream,
-      emitsInOrder(<Matcher>[equals(const AuthState())]),
+      emitsInOrder(<Matcher>[
+        equals(const AuthState(isBootstrapping: false)),
+      ]),
     );
 
     bloc.add(const LogOut());
@@ -126,6 +156,7 @@ void main() {
     await expectation;
     expect(didLogout, isTrue);
     expect(await storageService.getAuthToken(), isNull);
+    expect(await storageService.getAuthSession(), isNull);
     await bloc.close();
   });
 }

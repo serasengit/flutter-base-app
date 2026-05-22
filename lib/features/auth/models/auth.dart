@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter_base_app/features/auth/models/user.dart';
 
 ///
@@ -5,7 +6,7 @@ import 'package:flutter_base_app/features/auth/models/user.dart';
 ///
 /// Represents a successful authentication session.
 ///
-class Auth {
+class Auth extends Equatable {
   final String accessToken;
   final bool isAuthenticated;
   final User user;
@@ -29,4 +30,17 @@ class Auth {
       permissions: List<String>.from(json['permissions'] ?? []),
     );
   }
+
+  /// Serializes the auth session for local persistence.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'accessToken': accessToken,
+      'isAuthenticated': isAuthenticated,
+      'user': user.toJson(),
+      'permissions': permissions,
+    };
+  }
+
+  @override
+  List<Object?> get props => [accessToken, isAuthenticated, user, permissions];
 }

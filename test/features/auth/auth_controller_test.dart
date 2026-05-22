@@ -11,8 +11,10 @@ import 'package:flutter_base_app/features/auth/repositories/auth_repository.dart
 import 'package:flutter_base_app/features/auth/services/auth_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class _UnusedClient extends http.BaseClient {
   @override
@@ -61,7 +63,11 @@ class _RecordingAuthBloc extends AuthBloc {
 
 void main() {
   group('AuthController', () {
-    setUp(configureDependencies);
+    setUp(() {
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+      FlutterSecureStorage.setMockInitialValues(<String, String>{});
+      configureDependencies();
+    });
 
     testWidgets('dispatches login event when the form is valid', (
       tester,

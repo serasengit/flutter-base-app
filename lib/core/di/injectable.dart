@@ -8,6 +8,7 @@ import 'package:flutter_base_app/core/storage/storage_service.dart';
 import 'package:flutter_base_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_base_app/features/auth/repositories/auth_repository.dart';
 import 'package:flutter_base_app/features/auth/services/auth_service.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
@@ -73,8 +74,15 @@ void configureDependencies() {
     ),
   );
 
+  // Secure storage for sensitive values such as auth tokens
+  locator.registerLazySingleton<FlutterSecureStorage>(
+    () => FlutterSecureStorage(),
+  );
+
   // Local storage service
-  locator.registerLazySingleton<StorageService>(() => StorageService());
+  locator.registerLazySingleton<StorageService>(
+    () => StorageService(secureStorage: locator<FlutterSecureStorage>()),
+  );
 
   // Global dialog service
   locator.registerLazySingleton<DialogService>(() => DialogService());

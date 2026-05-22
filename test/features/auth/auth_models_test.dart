@@ -27,6 +27,22 @@ void main() {
     expect(user.name, 'Test User');
   });
 
+  test('User.toJson serializes the user model', () {
+    const user = User(
+      id: '1',
+      username: 'tester',
+      email: 'tester@example.com',
+      name: 'Test User',
+    );
+
+    expect(user.toJson(), <String, dynamic>{
+      'id': '1',
+      'username': 'tester',
+      'email': 'tester@example.com',
+      'name': 'Test User',
+    });
+  });
+
   test('Auth.fromJson builds an auth model with permissions', () {
     final auth = Auth.fromJson(<String, dynamic>{
       'accessToken': 'token',
@@ -42,5 +58,21 @@ void main() {
     expect(auth.isAuthenticated, isTrue);
     expect(auth.user.username, 'tester');
     expect(auth.permissions, <String>['users:read', 'cities:read']);
+  });
+
+  test('Auth.toJson serializes the auth model with permissions', () {
+    const auth = Auth(
+      accessToken: 'token',
+      isAuthenticated: true,
+      user: User(id: '1', username: 'tester'),
+      permissions: <String>['users:read', 'cities:read'],
+    );
+
+    expect(auth.toJson(), <String, dynamic>{
+      'accessToken': 'token',
+      'isAuthenticated': true,
+      'user': <String, dynamic>{'id': '1', 'username': 'tester', 'email': null, 'name': null},
+      'permissions': <String>['users:read', 'cities:read'],
+    });
   });
 }

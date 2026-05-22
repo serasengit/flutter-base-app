@@ -8,6 +8,11 @@ abstract class AuthEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+/// Startup event used to restore a previously persisted session.
+class RestoreSession extends AuthEvent {
+  const RestoreSession();
+}
+
 /// Login event
 class LogIn extends AuthEvent {
   final String username;

@@ -15,6 +15,7 @@ import 'package:flutter_base_app/features/auth/services/auth_service.dart';
 import 'package:flutter_base_app/features/home/presentation/views/home_view.dart';
 import 'package:flutter_base_app/l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:integration_test/integration_test.dart';
@@ -76,6 +77,7 @@ void main() {
 
     setUp(() {
       SharedPreferences.setMockInitialValues(<String, Object>{});
+      FlutterSecureStorage.setMockInitialValues(<String, String>{});
       appBloc = AppBloc();
       authBloc = _RecordingAuthBloc();
     });

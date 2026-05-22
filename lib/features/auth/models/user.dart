@@ -1,9 +1,11 @@
+import 'package:equatable/equatable.dart';
+
 ///
 /// Authenticated user model
 ///
 /// Represents the user returned by the backend after authentication.
 ///
-class User {
+class User extends Equatable {
   final String id;
   final String username;
   final String? email;
@@ -22,4 +24,17 @@ class User {
       name: json['name']?.toString(),
     );
   }
+
+  /// Serializes the user model for local persistence.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'username': username,
+      'email': email,
+      'name': name,
+    };
+  }
+
+  @override
+  List<Object?> get props => [id, username, email, name];
 }

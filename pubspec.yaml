@@ -66,10 +66,12 @@ dependencies:
 
   # Persistent local key-value storage
   # Commonly used for:
-  # - JWT tokens
   # - User preferences
   # - App settings
   shared_preferences: ^2.5.5
+
+  # Secure storage for sensitive values such as auth tokens
+  flutter_secure_storage: ^9.2.4
 
   # Application logger
   # Provides formatted console logging utilities

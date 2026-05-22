@@ -4,8 +4,15 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('AuthEvent', () {
     test('base AuthEvent props are empty', () {
-      const event = LogOut();
+      const event = RestoreSession();
 
+      expect(event.props, isEmpty);
+    });
+
+    test('RestoreSession supports equality through props', () {
+      const event = RestoreSession();
+
+      expect(event, const RestoreSession());
       expect(event.props, isEmpty);
     });
 

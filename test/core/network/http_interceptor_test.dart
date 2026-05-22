@@ -4,6 +4,7 @@ import 'package:flutter_base_app/core/network/api_error.dart';
 import 'package:flutter_base_app/core/network/http_interceptor.dart';
 import 'package:flutter_base_app/core/storage/storage_service.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,6 +16,7 @@ void main() {
 
     setUp(() async {
       SharedPreferences.setMockInitialValues(<String, Object>{});
+      FlutterSecureStorage.setMockInitialValues(<String, String>{});
 
       storageService = StorageService();
 

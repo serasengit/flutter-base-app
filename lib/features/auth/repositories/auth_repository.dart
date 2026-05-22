@@ -26,12 +26,17 @@ class AuthRepository {
   Future<Auth> login(Login login) async {
     final auth = await authService.login(login);
 
-    // Persist authentication token locally when login succeeds.
+    // Persist the full authentication session locally when login succeeds.
     if (auth.isAuthenticated && auth.accessToken.isNotEmpty) {
-      await storageService.saveAuthToken(auth.accessToken);
+      await storageService.saveAuthSession(auth);
     }
 
     return auth;
+  }
+
+  /// Restores the persisted authentication session if one exists.
+  Future<Auth?> restoreSession() async {
+    return storageService.getAuthSession();
   }
 
   /// Performs the logout process.
@@ -39,6 +44,6 @@ class AuthRepository {
   /// Clears both the remote session and locally stored token.
   Future<void> logout() async {
     await authService.logout();
-    await storageService.clearAuthToken();
+    await storageService.clearAuthSession();
   }
 }

@@ -6,6 +6,7 @@ import 'package:flutter_base_app/features/auth/models/user.dart';
 import 'package:flutter_base_app/features/auth/repositories/auth_repository.dart';
 import 'package:flutter_base_app/features/auth/services/auth_service.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -37,6 +38,7 @@ class _FakeAuthService extends AuthService {
 void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues(<String, Object>{});
+    FlutterSecureStorage.setMockInitialValues(<String, String>{});
     configureDependencies();
   });
 
@@ -59,6 +61,7 @@ void main() {
 
     expect(result, same(auth));
     expect(await storageService.getAuthToken(), 'token');
+    expect((await storageService.getAuthSession())?.user.username, 'tester');
   });
 
   test('does not store auth token when login is not authenticated', () async {
@@ -77,6 +80,29 @@ void main() {
     await repository.login(const Login(username: 'tester', password: 'secret'));
 
     expect(await storageService.getAuthToken(), isNull);
+    expect(await storageService.getAuthSession(), isNull);
+  });
+
+  test('restores persisted auth session', () async {
+    const auth = Auth(
+      accessToken: 'token',
+      isAuthenticated: true,
+      user: User(id: '1', username: 'tester'),
+      permissions: <String>['users:read'],
+    );
+    final storageService = StorageService();
+    await storageService.saveAuthSession(auth);
+
+    final repository = AuthRepository(
+      authService: _FakeAuthService(authToReturn: auth),
+      storageService: storageService,
+    );
+
+    final restored = await repository.restoreSession();
+
+    expect(restored?.accessToken, 'token');
+    expect(restored?.user.username, 'tester');
+    expect(restored?.permissions, <String>['users:read']);
   });
 
   test('logout clears persisted auth token', () async {
@@ -102,5 +128,6 @@ void main() {
 
     expect(didLogout, isTrue);
     expect(await storageService.getAuthToken(), isNull);
+    expect(await storageService.getAuthSession(), isNull);
   });
 }

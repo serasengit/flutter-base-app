@@ -9,6 +9,7 @@ import 'package:flutter_base_app/core/di/injectable.dart';
 import 'package:flutter_base_app/core/network/request_feedback_coordinator.dart';
 import 'package:flutter_base_app/core/utils/functions.dart';
 import 'package:flutter_base_app/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:flutter_base_app/features/auth/presentation/bloc/auth_event.dart';
 import 'package:flutter_base_app/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter_base_app/features/auth/presentation/views/auth_view.dart';
 import 'package:flutter_base_app/features/home/presentation/home_page.dart';
@@ -43,6 +44,9 @@ class _AppState extends State<App> {
 
     // Bind the navigator key to the request feedback coordinator.
     _requestFeedbackController.bind(_navigatorKey);
+
+    // Restore any persisted authentication session before deciding the home.
+    _authBloc.add(const RestoreSession());
   }
 
   @override
@@ -84,12 +88,28 @@ class _AppState extends State<App> {
                 supportedLocales: AppLocalizations.supportedLocales,
                 theme: _getAppTheme(),
 
-                // Display the authentication screen when there is no active user.
-                home: !isSet(state.auth) ? const AuthView() : const HomePage(),
+                home: switch ((state.isBootstrapping, isSet(state.auth))) {
+                  (true, _) => const _AppBootstrapView(),
+                  (false, false) => const AuthView(),
+                  (false, true) => const HomePage(),
+                },
               );
             },
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _AppBootstrapView extends StatelessWidget {
+  const _AppBootstrapView();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(color: ColorPalette.primaryColor),
       ),
     );
   }

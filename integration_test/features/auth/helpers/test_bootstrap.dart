@@ -8,6 +8,7 @@ import 'package:flutter_base_app/features/auth/models/auth.dart';
 import 'package:flutter_base_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_base_app/features/auth/repositories/auth_repository.dart';
 import 'package:flutter_base_app/features/auth/services/auth_service.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,6 +23,7 @@ Future<void> bootstrapTestApp(
 }) async {
   TestWidgetsFlutterBinding.ensureInitialized();
   SharedPreferences.setMockInitialValues(<String, Object>{});
+  FlutterSecureStorage.setMockInitialValues(<String, String>{});
   await tester.pumpWidget(const SizedBox.shrink());
   await tester.pump();
 
