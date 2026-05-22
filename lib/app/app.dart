@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_base_app/app/bloc/app_bloc.dart';
 import 'package:flutter_base_app/app/bloc/app_event.dart';
 import 'package:flutter_base_app/app/config/app_config.dart';
+import 'package:flutter_base_app/app/routes/app_modules.dart';
 import 'package:flutter_base_app/app/theme/color_palette.dart';
 import 'package:flutter_base_app/core/di/injectable.dart';
 import 'package:flutter_base_app/core/network/request_feedback_coordinator.dart';
@@ -71,12 +72,20 @@ class _AppState extends State<App> {
           child: CircularProgressIndicator(color: ColorPalette.primaryColor),
         ),
         child: BlocListener<AuthBloc, AuthState>(
-          // Listen only when the user changes from authenticated to unauthenticated.
-          listenWhen: (previous, current) =>
-              isSet(previous.auth) && !isSet(current.auth),
+          // Keep shell modules aligned with the current authenticated session.
+          listenWhen: (previous, current) => previous.auth != current.auth,
           listener: (context, state) {
-            // Clear application state when the user logs out.
-            context.read<AppBloc>().add(const PurgeApp());
+            if (!isSet(state.auth)) {
+              // Clear application state when the user logs out.
+              context.read<AppBloc>().add(const PurgeApp());
+              return;
+            }
+
+            final modules = resolveModulesForPermissions(
+              state.auth!.permissions,
+            );
+
+            context.read<AppBloc>().add(SetModules(modules: modules));
           },
           child: BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {

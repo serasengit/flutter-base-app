@@ -52,6 +52,27 @@ void main() {
     await bloc.close();
   });
 
+  test('AppBloc SetModules replaces the available modules and resets current module', () async {
+    final bloc = AppBloc();
+    const modules = <AppModule>[homeModule, logoutModule];
+
+    final expectation = expectLater(
+      bloc.stream,
+      emits(
+        predicate<AppState>((state) {
+          return state.modules == modules &&
+              state.module == homeModule &&
+              state.moduleHistory.isEmpty;
+        }),
+      ),
+    );
+
+    bloc.add(const SetModules(modules: modules));
+
+    await expectation;
+    await bloc.close();
+  });
+
   test('AppModule equality includes route metadata', () {
     const left = AppModule(
       route: AppRoutes.users,
@@ -69,5 +90,22 @@ void main() {
     );
 
     expect(left, right);
+  });
+
+  test('resolveModulesForPermissions keeps only always-visible and permitted modules', () {
+    final modules = resolveModulesForPermissions(const <String>[
+      'users:read',
+      ' meteo_stations:edit ',
+    ]);
+
+    expect(
+      modules.map((module) => module.route).toList(),
+      <String>[
+        AppRoutes.home,
+        AppRoutes.users,
+        AppRoutes.meteoStations,
+        AppRoutes.logout,
+      ],
+    );
   });
 }

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_base_app/app/bloc/app_bloc.dart';
+import 'package:flutter_base_app/app/bloc/app_event.dart';
+import 'package:flutter_base_app/app/routes/app_module.dart';
+import 'package:flutter_base_app/app/routes/app_modules.dart';
+import 'package:flutter_base_app/app/routes/app_routes.dart';
 import 'package:flutter_base_app/core/di/injectable.dart';
 import 'package:flutter_base_app/core/storage/storage_service.dart';
 import 'package:flutter_base_app/features/auth/presentation/bloc/auth_bloc.dart';
@@ -77,6 +81,40 @@ void main() {
     expect(find.text(l10n.users), findsOneWidget);
     expect(find.text(l10n.cities), findsOneWidget);
     expect(find.text(l10n.meteo_stations), findsOneWidget);
+    expect(find.text(l10n.logout), findsOneWidget);
+  });
+
+  testWidgets('drawer only shows modules allowed by the current shell state', (
+    tester,
+  ) async {
+    appBloc.add(
+      const SetModules(
+        modules: <AppModule>[
+          homeModule,
+          AppModule(
+            route: AppRoutes.users,
+            labelKey: 'users',
+            icon: Icons.people_outline,
+            order: 2,
+            permissionPrefixes: <String>['users:'],
+          ),
+          logoutModule,
+        ],
+      ),
+    );
+    await Future<void>.delayed(Duration.zero);
+
+    await tester.pumpWidget(_buildHome(appBloc, authBloc));
+    await tester.pumpAndSettle();
+
+    final l10n = AppLocalizations.of(tester.element(find.byType(HomeView)))!;
+
+    await tester.tap(find.byIcon(Icons.menu));
+    await tester.pumpAndSettle();
+
+    expect(find.text(l10n.users), findsOneWidget);
+    expect(find.text(l10n.cities), findsNothing);
+    expect(find.text(l10n.meteo_stations), findsNothing);
     expect(find.text(l10n.logout), findsOneWidget);
   });
 }

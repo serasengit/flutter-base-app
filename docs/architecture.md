@@ -50,6 +50,9 @@ The authenticated part of the app is modeled as a shell:
 - `AppBloc` manages available modules, active module and module history
 - `HomeView` renders the current module
 
+After login or persisted-session restore, the shell module list is rebuilt from
+the authenticated user permissions and pushed into `AppBloc` with `SetModules`.
+
 Current sample modules:
 
 - `home`

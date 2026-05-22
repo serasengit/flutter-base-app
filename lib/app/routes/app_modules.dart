@@ -43,3 +43,26 @@ const List<AppModule> appModules = <AppModule>[
   ),
   logoutModule,
 ];
+
+/// Resolves the shell modules visible to the authenticated user permissions.
+List<AppModule> resolveModulesForPermissions(Iterable<String> permissions) {
+  final normalizedPermissions = permissions
+      .map((permission) => permission.trim())
+      .where((permission) => permission.isNotEmpty)
+      .toList();
+
+  final resolvedModules = appModules.where((module) {
+    if (module.alwaysVisible || module.permissionPrefixes.isEmpty) {
+      return true;
+    }
+
+    return module.permissionPrefixes.any(
+      (prefix) => normalizedPermissions.any(
+        (permission) => permission.startsWith(prefix),
+      ),
+    );
+  }).toList();
+
+  resolvedModules.sort((left, right) => left.order.compareTo(right.order));
+  return resolvedModules;
+}
