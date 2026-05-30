@@ -101,6 +101,7 @@ Current setup:
 - `lib` as sources
 - `test` and `integration_test` as tests
 - `coverage/lcov.info` as coverage input
+- generic project identifiers in `sonar.projectKey` and `sonar.projectName` so the template does not expose internal naming
 
 Coverage exclusions include generated localization files and some constant-only files.
 
