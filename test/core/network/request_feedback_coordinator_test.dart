@@ -86,7 +86,7 @@ void main() {
         contains(l10n.operation_completed_successfully),
       );
 
-      coordinator.dispose();
+      await coordinator.dispose();
     });
 
     testWidgets('shows aggregated error messages for failed requests', (tester) async {
@@ -121,7 +121,7 @@ void main() {
         <String>['HTTP 404: Usuario no encontrado'],
       );
 
-      coordinator.dispose();
+      await coordinator.dispose();
     });
   });
 }
