@@ -78,18 +78,17 @@ void main() {
 
       expect(dialogService.openedType, DialogType.success);
       expect(dialogService.openedTitle, isNotEmpty);
-      expect(
-        <String?>[
-          dialogService.openedTitle,
-          dialogService.openedDescription,
-        ],
-        contains(l10n.operation_completed_successfully),
-      );
+      expect(<String?>[
+        dialogService.openedTitle,
+        dialogService.openedDescription,
+      ], contains(l10n.operation_completed_successfully));
 
       coordinator.dispose();
     });
 
-    testWidgets('shows aggregated error messages for failed requests', (tester) async {
+    testWidgets('shows aggregated error messages for failed requests', (
+      tester,
+    ) async {
       final tracker = RequestTracker();
       final dialogService = _RecordingDialogService();
       final coordinator = RequestFeedbackCoordinator(
@@ -116,10 +115,9 @@ void main() {
 
       expect(dialogService.messagesType, DialogType.error);
       expect(dialogService.messagesTitle, isNotEmpty);
-      expect(
-        dialogService.shownMessages,
-        <String>['HTTP 404: Usuario no encontrado'],
-      );
+      expect(dialogService.shownMessages, <String>[
+        'HTTP 404: Usuario no encontrado',
+      ]);
 
       coordinator.dispose();
     });
