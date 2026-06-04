@@ -83,7 +83,7 @@ void main() {
         dialogService.openedDescription,
       ], contains(l10n.operation_completed_successfully));
 
-      coordinator.dispose();
+      await coordinator.dispose();
     });
 
     testWidgets('shows aggregated error messages for failed requests', (
@@ -119,7 +119,7 @@ void main() {
         'HTTP 404: Usuario no encontrado',
       ]);
 
-      coordinator.dispose();
+      await coordinator.dispose();
     });
   });
 }
