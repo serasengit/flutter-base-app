@@ -145,44 +145,82 @@ build:
 sonar:
   stage: sonar
 
-  # Use the official SonarScanner CLI image.
+  # Use the Flutter image instead of the Sonar image.
+  # The Dart/Flutter Sonar plugin executes "flutter analyze"
+  # internally during the scan, so Flutter must be available
+  # in the container PATH.
   image:
-    name: sonarsource/sonar-scanner-cli:latest
-    entrypoint: [""] # Override the default entrypoint so GitLab can execute script commands.
+    name: ghcr.io/cirruslabs/flutter:stable
+    entrypoint: [""]
 
+  # Download the coverage report generated in the test stage.
   needs:
-    - job: test # Download coverage artifacts from the test job.
-      artifacts: true # Make coverage reports available to SonarScanner.
+    - job: test
+      artifacts: true
 
   variables:
-    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar" # Store SonarScanner cache inside the project workspace.
+    # Store SonarScanner cache inside the project workspace.
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
 
   cache:
-    key: sonar-cache # Reuse SonarScanner cache between pipeline executions.
+    key: sonar-cache
 
     paths:
-      - .sonar/cache/ # Cache downloaded SonarScanner analyzers and dependencies.
+      # Cache Sonar analyzers and plugins between executions.
+      - .sonar/cache/
 
-  # Skip the default Flutter setup because this job uses the SonarScanner image.
-  before_script: []
+    policy: pull-push
+
+  before_script:
+    # Print versions for troubleshooting.
+    - flutter --version
+    - dart --version
+
+    # Install project dependencies.
+    - flutter pub get
 
   script:
-    # Ensure the SonarQube server URL variable exists.
+    # Validate required SonarQube variables.
     - |
       if [ -z "$SONAR_HOST_URL" ]; then
         echo "SONAR_HOST_URL GitLab CI/CD variable is required."
         exit 1
       fi
 
-      # Ensure the SonarQube authentication token exists.
       if [ -z "$SONAR_TOKEN" ]; then
         echo "SONAR_TOKEN GitLab CI/CD variable is required."
         exit 1
       fi
 
-    # Run SonarScanner using sonar-project.properties.
-    - sonar-scanner -Dsonar.host.url="${SONAR_HOST_URL}" -Dsonar.token="${SONAR_TOKEN}"
+    # Run SonarQube analysis.
+    #
+    # The Dart plugin will automatically execute:
+    #   flutter analyze
+    #
+    # and import:
+    #   - source code metrics
+    #   - static analysis issues
+    #   - test coverage from lcov.info
+    #
+    # Make sure sonar-project.properties contains:
+    #
+    # sonar.sources=lib
+    # sonar.tests=test,integration_test
+    # sonar.dart.lcov.reportPaths=coverage/lcov.info
+    #
+    - sonar-scanner \
+      -Dsonar.host.url="${SONAR_HOST_URL}" \
+      -Dsonar.token="${SONAR_TOKEN}"
 
-  # Do not fail the full pipeline if SonarQube analysis fails.
-  # SonarQube Community Build does not officially support Dart analysis.
+  # Upload Sonar metadata for troubleshooting.
+  artifacts:
+    when: always
+
+    paths:
+      - .scannerwork/
+
+    expire_in: 1 week
+
+  # Optional:
+  # Keep the pipeline green if SonarQube is unavailable.
   allow_failure: true
