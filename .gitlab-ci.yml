@@ -159,7 +159,11 @@ sonar:
   variables:
     # Store SonarScanner cache inside the project workspace.
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+
+    # SonarScanner version to install.
     SONAR_SCANNER_VERSION: "7.2.0.5079"
+
+    # Installation directory inside the job workspace.
     SONAR_SCANNER_HOME: "${CI_PROJECT_DIR}/sonar-scanner"
 
   cache:
@@ -172,29 +176,58 @@ sonar:
     policy: pull-push
 
   before_script:
-    - flutter --version # Display tool versions for troubleshooting purposes.
+    # Display tool versions for troubleshooting purposes.
+    - flutter --version
     - dart --version
-    - flutter pub get # Install project dependencies.
-    - apt-get update # Install SonarScanner CLI because it is not included in the Flutter Docker image.
+
+    # Install project dependencies.
+    - flutter pub get
+
+    # Install SonarScanner CLI because it is not included
+    # in the Flutter Docker image.
+    - apt-get update
     - apt-get install -y curl unzip
-    - curl -L -o sonar-scanner.zip "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux-x64.zip" # Download SonarScanner.
+
+    # Download SonarScanner.
+    - curl -L -o sonar-scanner.zip "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux-x64.zip"
+
+    # Extract SonarScanner.
     - unzip -q sonar-scanner.zip
+
+    # Move SonarScanner to the configured installation directory.
     - mv "sonar-scanner-${SONAR_SCANNER_VERSION}-linux-x64" "${SONAR_SCANNER_HOME}"
-    - "${SONAR_SCANNER_HOME}/bin/sonar-scanner" --version # Verify installation.
+
+    # Verify installation.
+    - |
+      "${SONAR_SCANNER_HOME}/bin/sonar-scanner" --version
 
   script:
+    # Ensure the SonarQube server URL is configured.
     - |
       if [ -z "$SONAR_HOST_URL" ]; then
         echo "SONAR_HOST_URL GitLab CI/CD variable is required."
         exit 1
       fi
 
+    # Ensure the SonarQube authentication token is configured.
     - |
       if [ -z "$SONAR_TOKEN" ]; then
         echo "SONAR_TOKEN GitLab CI/CD variable is required."
         exit 1
       fi
 
+    # Run SonarQube analysis.
+    #
+    # The Dart plugin will automatically execute:
+    #   flutter analyze
+    #
+    # and import:
+    #   - static analysis issues
+    #   - code smells
+    #   - bugs
+    #   - vulnerabilities
+    #   - coverage from coverage/lcov.info
+    #
     - |
       "${SONAR_SCANNER_HOME}/bin/sonar-scanner" \
         -Dsonar.host.url="${SONAR_HOST_URL}" \
