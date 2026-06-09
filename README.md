@@ -17,6 +17,12 @@ Install dependencies:
 flutter pub get
 ```
 
+Run the Bloc debug viewer:
+
+```bash
+dart run tool/bloc_devtools_viewer.dart
+```
+
 Run the app:
 
 ```bash
@@ -34,6 +40,21 @@ Run coverage:
 ```bash
 flutter test --coverage
 ```
+
+## Bloc debug viewer
+
+During `debug` runs the app now publishes Bloc lifecycle, events, and transitions to a local WebSocket viewer.
+
+- Start the viewer with `dart run tool/bloc_devtools_viewer.dart`
+- Open `http://127.0.0.1:58987`
+- Run the Flutter app in debug mode
+- Override the WebSocket URL when needed with `--dart-define=BLOC_DEVTOOLS_URL=ws://<host>:58987/events`
+
+Host notes:
+
+- Android emulator usually needs `ws://10.0.2.2:58987/events`
+- Desktop Flutter can use the default `ws://127.0.0.1:58987/events`
+- Physical devices need the host machine LAN IP
 
 ## 🗂️ Project structure
 
