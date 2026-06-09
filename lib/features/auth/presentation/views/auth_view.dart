@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_base_app/app/config/app_config.dart';
 import 'package:flutter_base_app/app/theme/app_layout.dart';
 import 'package:flutter_base_app/core/validators/validators.dart';
 import 'package:flutter_base_app/features/auth/presentation/controllers/auth_controller.dart';
@@ -22,12 +23,6 @@ class _AuthContent extends StatefulWidget {
 
 class _AuthContentState extends State<_AuthContent> {
   final controller = AuthController();
-
-  @override
-  void initState() {
-    super.initState();
-    controller.initPackageInfo();
-  }
 
   @override
   void dispose() {
@@ -148,17 +143,12 @@ class _AuthContentState extends State<_AuthContent> {
         padding: EdgeInsets.symmetric(
           vertical: FormLayout.fieldSpacing(context) / 2,
         ),
-        child: ValueListenableBuilder<String?>(
-          valueListenable: controller.appVersion,
-          builder: (context, version, child) {
-            return Text(
-              'v$version',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
-            );
-          },
+        child: Text(
+          'v${AppConfig.version}+${AppConfig.buildNumber}',
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
         ),
       ),
     );

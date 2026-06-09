@@ -1,4 +1,5 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 ///
 /// Supported application environments
@@ -26,7 +27,30 @@ class AppConfig {
   ///
   static Future<void> load() async {
     await dotenv.load(fileName: '.env');
+
+    final info = await PackageInfo.fromPlatform();
+    _packageName = info.packageName.trim();
+    _version = info.version.trim();
+    _buildNumber = info.buildNumber.trim();
   }
+
+  ///
+  /// Application package name
+  ///
+  static String _packageName = '';
+  static String get packageName => _packageName;
+
+  ///
+  /// Application version
+  ///
+  static String _version = '';
+  static String get version => _version;
+
+  ///
+  /// Application build number
+  ///
+  static String _buildNumber = '';
+  static String get buildNumber => _buildNumber;
 
   ///
   /// Application display name
