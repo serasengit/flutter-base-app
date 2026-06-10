@@ -5,6 +5,7 @@ import 'package:flutter_base_app/features/auth/models/login.dart';
 import 'package:flutter_base_app/features/auth/services/auth_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
+import 'package:package_info_plus/package_info_plus.dart';
 
 class _RecordingClient extends http.BaseClient {
   _RecordingClient(this._handler);
@@ -22,6 +23,13 @@ class _RecordingClient extends http.BaseClient {
 void main() {
   group('AuthService', () {
     setUp(() async {
+      PackageInfo.setMockInitialValues(
+        appName: 'Flutter Base App',
+        packageName: 'com.example.flutter_base_app',
+        version: '1.0.0',
+        buildNumber: '1',
+        buildSignature: '',
+      );
       await AppConfig.load();
     });
 
