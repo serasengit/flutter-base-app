@@ -127,3 +127,13 @@ Required GitLab variables:
 - CI copies `.env.test` to `.env`
 - top-level module navigation is state-driven through `AppBloc`
 - example modules such as `users`, `cities` and `meteo_stations` are sample modules and can be replaced in real projects
+
+## 📄 License
+
+This project is licensed under the Apache License 2.0.
+
+This repository contains a reusable Flutter base application template created and maintained by Sergio Asensio.
+
+The source code may be used, modified, and distributed under the terms of the Apache 2.0 License.
+
+Client-specific implementations, proprietary business logic, internal configurations, credentials, branding assets, and company-specific documentation are not included in this repository and are not covered by this license.
